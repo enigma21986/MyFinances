@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">My Finances</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_searchable">SearchableActivity</string>
+
+    <!-- Search widget strings -->
+    <string name="app_label">My Finances</string>
+    <string name="search_hint">Search category...</string>
+
+</resources>

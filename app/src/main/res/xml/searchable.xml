@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<searchable xmlns:android="http://schemas.android.com/apk/res/android"
+    android:label="@string/app_label"
+    android:hint="@string/search_hint"
+    android:searchSuggestAuthority="com.mokin.myfinances.app.MyCustomProvider"
+    android:searchSuggestIntentAction="android.Intent.action.VIEW"
+    android:searchSuggestIntentData="content://com.mokin.myfinances.app/category" >
+</searchable>
