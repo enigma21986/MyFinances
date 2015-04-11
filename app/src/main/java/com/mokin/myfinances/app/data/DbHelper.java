@@ -15,7 +15,7 @@ public class DbHelper extends SQLiteOpenHelper {
     // DB constants.
     public static final String DB_NAME = "myfinances.db";
     // If you change the database schema, you must increment the database version.
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 5;
 
 
     public DbHelper(Context context) {
@@ -46,8 +46,8 @@ public class DbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_ACCOUNT_TABLE = "CREATE TABLE " + Account.TABLE_NAME + " (" +
                 Account._ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                 Account.COLUMN_NAME + " NVARCHAR NOT NULL," +
-                Account.COLUMN_CURRENCY_ID + " INTEGER NOT NULL REFERENCES " + Currency.TABLE_NAME + "(" + Currency._ID + ") ON DELETE RESTRICT," +
-                Account.COLUMN_INITIAL_BALANCE + " DOUBLE NOT NULL," +
+                // TODO: uncomment it!!!
+                //Account.COLUMN_CURRENCY_ID + " INTEGER NOT NULL REFERENCES " + Currency.TABLE_NAME + "(" + Currency._ID + ") ON DELETE RESTRICT," +
                 Account.COLUMN_COMMENT + " NVARCHAR);";
 
         final String SQL_CREATE_BUDGET_TABLE = "CREATE TABLE " + Budget.TABLE_NAME + " (" +
@@ -60,11 +60,11 @@ public class DbHelper extends SQLiteOpenHelper {
 
         final String SQL_CREATE_TRANSACTION_TABLE = "CREATE TABLE " + Transaction.TABLE_NAME + " (" +
                 Transaction._ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                Transaction.COLUMN_TRANSACTION_DATETIME + " DATETIME NOT NULL," +
+                Transaction.COLUMN_TRANSACTION_DATETIME + " INTEGER NOT NULL," +
                 Transaction.COLUMN_TRANSACTION_AMOUNT + " DOUBLE NOT NULL," +
                 Transaction.COLUMN_ACCOUNT_ID + " INTEGER NOT NULL REFERENCES " + Account.TABLE_NAME + "(" + Account._ID + ") ON DELETE RESTRICT," +
                 Transaction.COLUMN_CATEGORY_ID + " INTEGER REFERENCES " + Category.TABLE_NAME + "(" + Category._ID + ") ON DELETE RESTRICT," +
-                Transaction.COLUMN_TRANSACTION_TYPE_ID + " INTEGER NOT NULL REFERENCES " + TransactionType.TABLE_NAME + "(" + TransactionType._ID + ") ON DELETE RESTRICT DEFAULT 1," +
+                Transaction.COLUMN_TRANSACTION_TYPE_ID + " INTEGER NOT NULL REFERENCES " + TransactionType.TABLE_NAME + "(" + TransactionType._ID + ") ON DELETE RESTRICT," +
                 Transaction.COLUMN_COMMENT + " NVARCHAR," +
                 Transaction.COLUMN_ACCOUNT_SOURCE + " INTEGER REFERENCES " + Account.TABLE_NAME + "(" + Account._ID + ") ON DELETE RESTRICT," +
                 Transaction.COLUMN_ACCOUNT_TARGET + " INTEGER REFERENCES " + Account.TABLE_NAME + "(" + Account._ID + ") ON DELETE RESTRICT);";
@@ -79,7 +79,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
         ContentValues cv = new ContentValues();
 
-        cv.put(TransactionType.COLUMN_NAME, "Доход");
+/*        cv.put(TransactionType.COLUMN_NAME, "Доход");
         sqLiteDatabase.insert(TransactionType.TABLE_NAME, null, cv);
 
         cv.put(TransactionType.COLUMN_NAME, "Расход");
@@ -89,15 +89,29 @@ public class DbHelper extends SQLiteOpenHelper {
             cv.put(Category.COLUMN_NAME, "яйцо " + i);
             cv.put(Category.COLUMN_TRANSACTION_TYPE_ID, 1);
             sqLiteDatabase.insert(Category.TABLE_NAME, null, cv);
+        }*/
+
+        for (int i = 1; i <= 3; i++) {
+            cv.put(Account.COLUMN_NAME, "Счет " + i);
+            cv.put(Account.COLUMN_COMMENT, "Комментарий " + i);
+            sqLiteDatabase.insert(Account.TABLE_NAME, null, cv);
         }
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-//        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + LocationEntry.TABLE_NAME);
-//        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + WeatherEntry.TABLE_NAME);
-//        onCreate(sqLiteDatabase);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Transaction.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Budget.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Account.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Currency.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Category.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TransactionType.TABLE_NAME);
+        onCreate(sqLiteDatabase);
     }
 
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        super.onDowngrade(db, oldVersion, newVersion);
+    }
 }

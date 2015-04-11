@@ -18,7 +18,7 @@ public class MyFinancesContract {
     public static final String PATH_ACCOUNT = "account";
     public static final String PATH_BUDGET = "budget";
     public static final String PATH_CURRENCY = "currency";
-    public static final String PATH_TRANSACTION = "transaction";
+    public static final String PATH_TRANSACTION = "transactions";
     public static final String PATH_TRANSACTION_TYPE = "transaction_type";
 
 

@@ -25,6 +25,8 @@
                 android:resource="@xml/searchable" />
         </activity>
 
+        <activity android:name=".detail_activities.AccountDetails" />
+
         <provider
             android:name=".data.MyCustomProvider"
             android:authorities="com.mokin.myfinances.app"

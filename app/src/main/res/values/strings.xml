@@ -9,4 +9,22 @@
     <string name="app_label">My Finances</string>
     <string name="search_hint">Search category...</string>
 
+    <!-- General -->
+    <string name="empty_list">(No items. Click Add to create new one)</string>
+    <string name="comment_hint">Comment</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_new">Add</string>
+
+    <!-- Account list activity -->
+    <string name="account_name">New account</string>
+    <string name="account_balance">0</string>
+
+    <!-- Account details activity -->
+    <string name="account_name_hint">Account name</string>
+    <string name="confirm_delete">Are you sure to delete the account?</string>
+
+
+
 </resources>
