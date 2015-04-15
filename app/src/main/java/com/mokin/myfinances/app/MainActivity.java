@@ -5,7 +5,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,27 +26,51 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private ListView listView;
-    private AccountAdapter accountAdapter;
-
-    ArrayList<Account> accountArrayList = new ArrayList<Account>();
+    private AccountAdapter mAccountAdapter;
 
     public static String ACCOUNT_ENTRY = "com.mokin.myfinances.app.Account";
     public static int ACCOUNT_DETAILS_REQUEST = 1;
+
+    private static final int ACCOUNT_LOADER = 0;
+
+
+    //ArrayList<Account> accountArrayList = new ArrayList<Account>();
+    //private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list_layout);
 
-        listView = (ListView) findViewById(R.id.listView);
+        // The CursorAdapter will take data from our cursor and populate the ListView.
+        mAccountAdapter = new AccountAdapter(this, null, 0);
 
+        // Get a reference to the ListView, and attach this adapter to it.
+        ListView listView = (ListView) findViewById(R.id.listView);
         listView.setEmptyView(findViewById(R.id.emptyView));
+        listView.setAdapter(mAccountAdapter);
 
-        // ???
-        listView.setOnItemClickListener(new ListViewClickListener());
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if (cursor != null) {
+                    Bundle bundle = new Bundle();
+                    bundle.putLong(MyFinancesContract.Account._ID, cursor.getLong(MyFinancesContract.Account.COL_ID_IDX));
+                    bundle.putString(MyFinancesContract.Account.COLUMN_NAME, cursor.getString(MyFinancesContract.Account.COL_NAME_IDX));
+                    bundle.putLong(MyFinancesContract.Account.COLUMN_CURRENCY_ID, cursor.getLong(MyFinancesContract.Account.COL_CURRENCY_ID_IDX));
+                    bundle.putString(MyFinancesContract.Account.COLUMN_COMMENT, cursor.getString(MyFinancesContract.Account.COL_COMMENT_IDX));
+
+                    showAccountDetails(bundle);
+                }
+
+            }
+        };
 
         Cursor cursor = getContentResolver().query(MyFinancesContract.Account.CONTENT_URI, null, null, null, null);
 
@@ -59,14 +87,16 @@ public class MainActivity extends ActionBarActivity {
 
         accountAdapter = new AccountAdapter(this, accountArrayList);
 
-        listView.setAdapter(accountAdapter);
+
+
+
+        getLoaderManager().initLoader(ACCOUNT_LOADER, null, this);
 
         //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
     }
 
 
-    class ListViewClickListener implements OnItemClickListener {
+/*    class ListViewClickListener implements OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Account account = (Account) parent.getAdapter().getItem(position);
@@ -74,11 +104,12 @@ public class MainActivity extends ActionBarActivity {
 
             showAccountDetails(account);
         }
-    }
+    }*/
 
-    private void showAccountDetails(Account account) {
+
+    private void showAccountDetails(Bundle bundle) {
         Intent intentAccountDetails = new Intent(MainActivity.this, AccountDetails.class);
-        intentAccountDetails.putExtra(ACCOUNT_ENTRY, account);
+        intentAccountDetails.putExtra(ACCOUNT_ENTRY, bundle);
         startActivityForResult(intentAccountDetails, ACCOUNT_DETAILS_REQUEST);
     }
 
@@ -177,5 +208,29 @@ public class MainActivity extends ActionBarActivity {
         cv.put(MyFinancesContract.Account.COLUMN_NAME, account.getName());
         cv.put(MyFinancesContract.Account.COLUMN_COMMENT, account.getComment());
         return cv;
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        // Sort order:  Ascending
+        String sortOrder = MyFinancesContract.Account.COLUMN_NAME + " ASC";
+
+        return new CursorLoader(this,
+                MyFinancesContract.Account.CONTENT_URI,
+                MyFinancesContract.Account.ACCOUNT_COLUMNS,
+                null,
+                null,
+                sortOrder);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        mAccountAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        mAccountAdapter.swapCursor(null);
     }
 }

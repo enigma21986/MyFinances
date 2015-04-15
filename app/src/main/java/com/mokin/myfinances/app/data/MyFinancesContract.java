@@ -63,12 +63,23 @@ public class MyFinancesContract {
     public static final class Account implements BaseColumns {
         // Table name (path)
         public static final String TABLE_NAME = PATH_ACCOUNT;
-
         // Table fields
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_CURRENCY_ID = "currency_id";
-        public static final String COLUMN_INITIAL_BALANCE = "initial_balance";
         public static final String COLUMN_COMMENT = "comment";
+
+        public static final String[] ACCOUNT_COLUMNS = {
+                TABLE_NAME + "." + _ID,
+                COLUMN_NAME,
+                COLUMN_CURRENCY_ID,
+                COLUMN_COMMENT
+        };
+
+        // Indexes related to ACCOUNT_COLUMNS. If ACCOUNT_COLUMNS changes, these must be changed
+        public static final int COL_ID_IDX = 0;
+        public static final int COL_NAME_IDX = 1;
+        public static final int COL_CURRENCY_ID_IDX = 2;
+        public static final int COL_COMMENT_IDX = 3;
 
         // URI that identifies data in the provider
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_ACCOUNT).build();
