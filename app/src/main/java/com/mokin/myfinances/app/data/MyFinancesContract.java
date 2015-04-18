@@ -1,5 +1,6 @@
 package com.mokin.myfinances.app.data;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -19,7 +20,7 @@ public class MyFinancesContract {
     public static final String PATH_BUDGET = "budget";
     public static final String PATH_CURRENCY = "currency";
     public static final String PATH_TRANSACTION = "transactions";
-    public static final String PATH_TRANSACTION_TYPE = "transaction_type";
+    public static final String PATH_MARKET = "market";
 
 
     public static final class Category implements BaseColumns {
@@ -36,27 +37,9 @@ public class MyFinancesContract {
 
         // MIME types
         public static final String MIME_TYPE =
-                "vnd.android.cursor.dir/vnd." + CONTENT_AUTHORITY + "." + PATH_CATEGORY;
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CATEGORY;
         public static final String MIME_ITEM_TYPE =
-                "vnd.android.cursor.item/vnd." + CONTENT_AUTHORITY + "." + PATH_CATEGORY;
-    }
-
-
-    public static final class TransactionType implements BaseColumns {
-        // Table name (path)
-        public static final String TABLE_NAME = PATH_TRANSACTION_TYPE;
-
-        // Table fields
-        public static final String COLUMN_NAME = "name";
-
-        // URI that identifies data in the provider
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRANSACTION_TYPE).build();
-
-        // MIME types
-        public static final String MIME_TYPE =
-                "vnd.android.cursor.dir/vnd." + CONTENT_AUTHORITY + "." + PATH_TRANSACTION_TYPE;
-        public static final String MIME_ITEM_TYPE =
-                "vnd.android.cursor.item/vnd." + CONTENT_AUTHORITY + "." + PATH_TRANSACTION_TYPE;
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_CATEGORY;
     }
 
 
@@ -134,7 +117,7 @@ public class MyFinancesContract {
     }
 
 
-    public static final class Transaction implements BaseColumns {
+    public static final class Transactions implements BaseColumns {
         // Table name (path)
         public static final String TABLE_NAME = PATH_TRANSACTION;
 
@@ -145,6 +128,7 @@ public class MyFinancesContract {
         public static final String COLUMN_CATEGORY_ID = "category_id";
         public static final String COLUMN_TRANSACTION_TYPE_ID = "transaction_type_id";
         public static final String COLUMN_COMMENT = "comment";
+        public static final String COLUMN_MARKET_ID = "market_id";
         public static final String COLUMN_ACCOUNT_SOURCE = "account_source";
         public static final String COLUMN_ACCOUNT_TARGET = "account_target";
 
@@ -157,6 +141,24 @@ public class MyFinancesContract {
                 "vnd.android.cursor.dir/vnd." + CONTENT_AUTHORITY + "." + PATH_TRANSACTION;
         public static final String MIME_ITEM_TYPE =
                 "vnd.android.cursor.item/vnd." + CONTENT_AUTHORITY + "." + PATH_TRANSACTION;
+    }
+
+    public static final class Market implements BaseColumns {
+        // Table name (path)
+        public static final String TABLE_NAME = PATH_MARKET;
+
+        // Table fields
+        public static final String COLUMN_NAME = "name";
+        public static final String COLUMN_COMMENT = "comment";
+
+        // URI that identifies data in the provider
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_MARKET).build();
+
+        // MIME types
+        public static final String MIME_TYPE =
+                "vnd.android.cursor.dir/vnd." + CONTENT_AUTHORITY + "." + PATH_MARKET;
+        public static final String MIME_ITEM_TYPE =
+                "vnd.android.cursor.item/vnd." + CONTENT_AUTHORITY + "." + PATH_MARKET;
     }
 
 }

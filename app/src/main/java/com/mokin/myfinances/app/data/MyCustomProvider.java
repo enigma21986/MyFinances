@@ -17,8 +17,8 @@ public class MyCustomProvider extends ContentProvider {
     private static final int CATEGORY = 100;
     private static final int CATEGORY_ID = 101;
     private static final int CATEGORY_SEARCH = 102;
-    private static final int TRANSACTION_TYPE = 200;
-    private static final int TRANSACTION_TYPE_ID = 201;
+    private static final int MARKET = 200;
+    private static final int MARKET_ID = 201;
     private static final int CURRENCY = 300;
     private static final int CURRENCY_ID = 301;
     private static final int ACCOUNT = 400;
@@ -42,8 +42,8 @@ public class MyCustomProvider extends ContentProvider {
         matcher.addURI(authority, MyFinancesContract.PATH_CATEGORY + "/#", CATEGORY_ID);
         matcher.addURI(authority, MyFinancesContract.PATH_CATEGORY + "/*", CATEGORY_SEARCH);
 
-        matcher.addURI(authority, MyFinancesContract.PATH_TRANSACTION_TYPE, TRANSACTION_TYPE);
-        matcher.addURI(authority, MyFinancesContract.PATH_TRANSACTION_TYPE + "/#", TRANSACTION_TYPE_ID);
+        matcher.addURI(authority, MyFinancesContract.PATH_MARKET, MARKET);
+        matcher.addURI(authority, MyFinancesContract.PATH_MARKET + "/#", MARKET_ID);
 
         matcher.addURI(authority, MyFinancesContract.PATH_CURRENCY, CURRENCY);
         matcher.addURI(authority, MyFinancesContract.PATH_CURRENCY + "/#", CURRENCY_ID);
@@ -80,6 +80,11 @@ public class MyCustomProvider extends ContentProvider {
                 if (_id > 0)
                     returnUri = ContentUris.withAppendedId(MyFinancesContract.Category.CONTENT_URI, _id);
                 break;
+            case MARKET:
+                _id = db.insert(MyFinancesContract.Market.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = ContentUris.withAppendedId(MyFinancesContract.Market.CONTENT_URI, _id);
+                break;
             case ACCOUNT:
                 _id = db.insert(MyFinancesContract.Account.TABLE_NAME, null, values);
                 if (_id > 0)
@@ -91,9 +96,9 @@ public class MyCustomProvider extends ContentProvider {
                     returnUri = ContentUris.withAppendedId(MyFinancesContract.Budget.CONTENT_URI, _id);
                 break;
             case TRANSACTION:
-                _id = db.insert(MyFinancesContract.Transaction.TABLE_NAME, null, values);
+                _id = db.insert(MyFinancesContract.Transactions.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = ContentUris.withAppendedId(MyFinancesContract.Transaction.CONTENT_URI, _id);
+                    returnUri = ContentUris.withAppendedId(MyFinancesContract.Transactions.CONTENT_URI, _id);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -115,6 +120,9 @@ public class MyCustomProvider extends ContentProvider {
             case CATEGORY:
                 rowsDeleted = db.delete(MyFinancesContract.Category.TABLE_NAME, selection, selectionArgs);
                 break;
+            case MARKET:
+                rowsDeleted = db.delete(MyFinancesContract.Market.TABLE_NAME, selection, selectionArgs);
+                break;
             case ACCOUNT:
                 rowsDeleted = db.delete(MyFinancesContract.Account.TABLE_NAME, selection, selectionArgs);
                 break;
@@ -122,7 +130,7 @@ public class MyCustomProvider extends ContentProvider {
                 rowsDeleted = db.delete(MyFinancesContract.Budget.TABLE_NAME, selection, selectionArgs);
                 break;
             case TRANSACTION:
-                rowsDeleted = db.delete(MyFinancesContract.Transaction.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(MyFinancesContract.Transactions.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -181,30 +189,6 @@ public class MyCustomProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
-            // "transaction_type"
-            case TRANSACTION_TYPE:
-                returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.TransactionType.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            // "transaction_type/#"
-            case TRANSACTION_TYPE_ID:
-                returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.TransactionType.TABLE_NAME,
-                        projection,
-                        MyFinancesContract.TransactionType._ID + " = " + uri.getLastPathSegment(),
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
             // "currency"
             case CURRENCY:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
@@ -223,6 +207,30 @@ public class MyCustomProvider extends ContentProvider {
                         MyFinancesContract.Currency.TABLE_NAME,
                         projection,
                         MyFinancesContract.Currency._ID + " = " + uri.getLastPathSegment(),
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            // "market"
+            case MARKET:
+                returnCursor = mOpenHelper.getReadableDatabase().query(
+                        MyFinancesContract.Market.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            // "market/#"
+            case MARKET_ID:
+                returnCursor = mOpenHelper.getReadableDatabase().query(
+                        MyFinancesContract.Market.TABLE_NAME,
+                        projection,
+                        MyFinancesContract.Market._ID + " = " + uri.getLastPathSegment(),
                         selectionArgs,
                         null,
                         null,
@@ -280,7 +288,7 @@ public class MyCustomProvider extends ContentProvider {
             // "transaction"
             case TRANSACTION:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Transaction.TABLE_NAME,
+                        MyFinancesContract.Transactions.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -292,9 +300,9 @@ public class MyCustomProvider extends ContentProvider {
             // "transaction/#"
             case TRANSACTION_ID:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Transaction.TABLE_NAME,
+                        MyFinancesContract.Transactions.TABLE_NAME,
                         projection,
-                        MyFinancesContract.Transaction._ID + " = " + uri.getLastPathSegment(),
+                        MyFinancesContract.Transactions._ID + " = " + uri.getLastPathSegment(),
                         selectionArgs,
                         null,
                         null,
@@ -317,8 +325,11 @@ public class MyCustomProvider extends ContentProvider {
             case CATEGORY:
                 rowsUpdated = db.update(MyFinancesContract.Category.TABLE_NAME, values, selection, selectionArgs);
                 break;
+            case MARKET:
+                rowsUpdated = db.update(MyFinancesContract.Market.TABLE_NAME, values, selection, selectionArgs);
+                break;
             case TRANSACTION:
-                rowsUpdated = db.update(MyFinancesContract.Transaction.TABLE_NAME, values, selection, selectionArgs);
+                rowsUpdated = db.update(MyFinancesContract.Transactions.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case ACCOUNT:
                 rowsUpdated = db.update(MyFinancesContract.Account.TABLE_NAME, values, selection, selectionArgs);

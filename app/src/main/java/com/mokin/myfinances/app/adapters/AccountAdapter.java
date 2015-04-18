@@ -13,7 +13,6 @@ import com.mokin.myfinances.app.data.MyFinancesContract;
 
 /**
  * Created by Alexey on 08.04.2015.
- * почему ниже именно так ArrayAdapter<Account>, а не ArrayAdapter ???
  */
 public class AccountAdapter extends CursorAdapter {
 
@@ -37,10 +36,12 @@ public class AccountAdapter extends CursorAdapter {
 
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        // Read name from cursor
+        // Read data from cursor
         String accountName = cursor.getString(MyFinancesContract.Account.COL_NAME_IDX);
+        String accountCurrency = cursor.getString(MyFinancesContract.Account.COL_CURRENCY_ID_IDX);
         // Find TextView and set value on it
         viewHolder.accountName.setText(accountName);
+        viewHolder.accountCurrency.setText(accountCurrency);
 
     }
 
@@ -49,11 +50,11 @@ public class AccountAdapter extends CursorAdapter {
      */
     public static class ViewHolder {
         public final TextView accountName;
-        //public final TextView accountComment;
+        public final TextView accountCurrency;
 
         public ViewHolder(View view) {
             accountName = (TextView) view.findViewById(R.id.account_name);
-            //accountComment = (TextView) view.findViewById(R.id.account_balance);
+            accountCurrency = (TextView) view.findViewById(R.id.account_currency);
         }
     }
 }
