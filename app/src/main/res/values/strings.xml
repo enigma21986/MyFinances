@@ -25,8 +25,16 @@
     <string name="account_name_hint">Account name</string>
     <string name="confirm_delete">Are you sure to delete the account?</string>
 
+    <!-- Navigation drawer items -->
+    <string-array name="drawer_array">
+        <item>Accounts</item>
+        <item>Categories</item>
+        <item>Transactions</item>
+    </string-array>
 
-
+    <!-- Temp -->
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 
 
 </resources>

@@ -29,8 +29,11 @@ import com.mokin.myfinances.app.detail_activities.AccountDetailsFragment;
 public class AccountListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private AccountAdapter mAccountAdapter;
+    private ListView mListView;
+    private int mPosition = ListView.INVALID_POSITION;
 
-    //public static String ACCOUNT_ENTRY = "com.mokin.myfinances.app.Account";
+    private static final String SELECTED_KEY = "selected_position";
+
     public static int ACCOUNT_DETAILS_REQUEST = 1;
     private static final int ACCOUNT_LOADER = 0;
 
@@ -60,12 +63,12 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
         mAccountAdapter = new AccountAdapter(getActivity(), null, 0);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        ListView listView = (ListView) rootView.findViewById(R.id.listView);
-        listView.setEmptyView(rootView.findViewById(R.id.emptyView));
-        listView.setAdapter(mAccountAdapter);
+        mListView = (ListView) rootView.findViewById(R.id.listView);
+        mListView.setEmptyView(rootView.findViewById(R.id.emptyView));
+        mListView.setAdapter(mAccountAdapter);
 
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // CursorAdapter returns a cursor at the correct position for getItem(), or null
@@ -75,9 +78,14 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
                     Uri uri = ContentUris.withAppendedId(MyFinancesContract.Account.CONTENT_URI, cursor.getLong(MyFinancesContract.Account.COL_ID_IDX));
                     showAccountDetails(uri);
                 }
-
+                mPosition = position;
             }
         });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
+
         return rootView;
     }
 
@@ -177,6 +185,18 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
 
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // When tablets rotate, the currently selected list item needs to be saved.
+        // When no item is selected, mPosition will be set to Listview.INVALID_POSITION,
+        // so check for that before storing.
+        if (mPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         // Sort order:  Ascending
         String sortOrder = MyFinancesContract.Account.COLUMN_NAME + " ASC";
@@ -190,12 +210,16 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        mAccountAdapter.swapCursor(cursor);
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAccountAdapter.swapCursor(data);
+        if (mPosition != ListView.INVALID_POSITION) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            mListView.smoothScrollToPosition(mPosition);
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         mAccountAdapter.swapCursor(null);
     }
 

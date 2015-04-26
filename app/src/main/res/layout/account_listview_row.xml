@@ -11,7 +11,9 @@
         android:text="@string/account_name"
         android:padding="2dp"
         android:textSize="20sp"
-        android:layout_alignParentLeft="true"/>
+        android:layout_alignParentLeft="true"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceLarge" />
 
     <TextView
         android:id="@+id/account_currency"
@@ -21,6 +23,8 @@
         android:text="@string/account_balance"
         android:padding="2dp"
         android:textSize="15sp"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentRight="true"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceSmall" />
 
 </RelativeLayout>

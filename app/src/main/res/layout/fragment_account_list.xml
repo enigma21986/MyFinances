@@ -6,6 +6,7 @@
     tools:context=".MainActivity$AccountListFragment">
 
     <ListView
+        android:background="@drawable/touch_selector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/listView" />
