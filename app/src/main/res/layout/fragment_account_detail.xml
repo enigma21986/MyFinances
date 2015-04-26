@@ -10,14 +10,16 @@
         android:id="@+id/et_account_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceMedium"
         android:hint="@string/account_name_hint" />
 
     <EditText
         android:id="@+id/et_account_comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceMedium"
         android:hint="@string/comment_hint"/>
 
 

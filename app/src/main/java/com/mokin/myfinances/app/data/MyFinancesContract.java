@@ -32,6 +32,19 @@ public class MyFinancesContract {
         public static final String COLUMN_PARENT_ID = "parent_id";
         public static final String COLUMN_TRANSACTION_TYPE_ID = "transaction_type_id";
 
+        public static final String[] CATEGORY_COLUMNS = {
+                TABLE_NAME + "." + _ID,
+                COLUMN_NAME,
+                COLUMN_PARENT_ID,
+                COLUMN_TRANSACTION_TYPE_ID
+        };
+
+        // Indexes related to CATEGORY_COLUMNS. If CATEGORY_COLUMNS changes, these must be changed
+        public static final int COL_ID_IDX = 0;
+        public static final int COL_NAME_IDX = 1;
+        public static final int COL_PARENT_ID_IDX = 2;
+        public static final int COL_TRANSACTION_TYPE_ID_IDX = 3;
+
         // URI that identifies data in the provider
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_CATEGORY).build();
 

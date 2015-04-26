@@ -3,4 +3,4 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:name="com.mokin.myfinances.app.AccountListFragment" />
+    android:name="com.mokin.myfinances.app.master_views.AccountListFragment" />

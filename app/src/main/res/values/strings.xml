@@ -17,24 +17,26 @@
     <string name="cancel">Cancel</string>
     <string name="add_new">Add</string>
 
-    <!-- Account list activity -->
+    <!-- Account master view -->
     <string name="account_name">New account</string>
     <string name="account_balance">0</string>
 
-    <!-- Account details activity -->
+    <!-- Account details view -->
     <string name="account_name_hint">Account name</string>
     <string name="confirm_delete">Are you sure to delete the account?</string>
 
-    <!-- Navigation drawer items -->
+    <!-- Navigation drawer stuff -->
     <string-array name="drawer_array">
         <item>Accounts</item>
         <item>Categories</item>
         <item>Transactions</item>
     </string-array>
 
-    <!-- Temp -->
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+
+    <!-- Category master view -->
+    <string name="category_name">New category</string>
 
 
 </resources>

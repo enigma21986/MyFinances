@@ -1,4 +1,4 @@
-package com.mokin.myfinances.app.detail_activities;
+package com.mokin.myfinances.app.detail_views;
 
 import android.app.Activity;
 import android.app.AlertDialog;

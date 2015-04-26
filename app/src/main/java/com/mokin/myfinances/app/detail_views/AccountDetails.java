@@ -1,4 +1,4 @@
-package com.mokin.myfinances.app.detail_activities;
+package com.mokin.myfinances.app.detail_views;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;

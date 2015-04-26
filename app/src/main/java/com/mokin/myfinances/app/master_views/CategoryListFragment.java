@@ -1,4 +1,4 @@
-package com.mokin.myfinances.app;
+package com.mokin.myfinances.app.master_views;
 
 import android.app.Activity;
 import android.content.ContentUris;
@@ -21,51 +21,57 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.mokin.myfinances.app.adapters.AccountAdapter;
+import com.mokin.myfinances.app.R;
+import com.mokin.myfinances.app.adapters.CategoryAdapter;
 import com.mokin.myfinances.app.data.MyFinancesContract;
-import com.mokin.myfinances.app.detail_activities.AccountDetails;
-import com.mokin.myfinances.app.detail_activities.AccountDetailsFragment;
+import com.mokin.myfinances.app.detail_views.AccountDetails;
+import com.mokin.myfinances.app.detail_views.AccountDetailsFragment;
 
-public class AccountListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+/**
+ * Created by Alexey on 26.04.2015.
+ */
+public class CategoryListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private AccountAdapter mAccountAdapter;
+    private CategoryAdapter mCategoryAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
 
     private static final String SELECTED_KEY = "selected_position";
 
-    public static int ACCOUNT_DETAILS_REQUEST = 1;
-    private static final int ACCOUNT_LOADER = 0;
+    public static int CATEGORY_DETAILS_REQUEST = 1;
+    private static final int CATEGORY_LOADER = 0;
 
-    public AccountListFragment() {
+
+    public CategoryListFragment() {
+        setHasOptionsMenu(true);
     }
 
-    @Override
+    /*@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // TODO: To check whether it can be moved to constructor or not
         setHasOptionsMenu(true);
-    }
+    }*/
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(ACCOUNT_LOADER, null, this);
+        getLoaderManager().initLoader(CATEGORY_LOADER, null, this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_account_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_category_list, container, false);
 
         // The CursorAdapter will take data from our cursor and populate the ListView.
-        mAccountAdapter = new AccountAdapter(getActivity(), null, 0);
+        mCategoryAdapter = new CategoryAdapter(getActivity(), null, 0);
 
         // Get a reference to the ListView, and attach this adapter to it.
         mListView = (ListView) rootView.findViewById(R.id.listView);
         mListView.setEmptyView(rootView.findViewById(R.id.emptyView));
-        mListView.setAdapter(mAccountAdapter);
+        mListView.setAdapter(mCategoryAdapter);
 
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -75,8 +81,8 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
-                    Uri uri = ContentUris.withAppendedId(MyFinancesContract.Account.CONTENT_URI, cursor.getLong(MyFinancesContract.Account.COL_ID_IDX));
-                    showAccountDetails(uri);
+                    Uri uri = ContentUris.withAppendedId(MyFinancesContract.Category.CONTENT_URI, cursor.getLong(MyFinancesContract.Category.COL_ID_IDX));
+                    showCategoryDetails(uri);
                 }
                 mPosition = position;
             }
@@ -91,6 +97,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        // TODO: change?
         inflater.inflate(R.menu.menu_account_list, menu);
     }
 
@@ -99,22 +106,22 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
 
         switch (item.getItemId()) {
             case R.id.add_new:
-                showAccountDetails(null);
+                showCategoryDetails(null);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void showAccountDetails(Uri uri) {
+    private void showCategoryDetails(Uri uri) {
         Intent intentAccountDetails = new Intent(getActivity(), AccountDetails.class);
         intentAccountDetails.setData(uri);
-        startActivityForResult(intentAccountDetails, ACCOUNT_DETAILS_REQUEST);
+        startActivityForResult(intentAccountDetails, CATEGORY_DETAILS_REQUEST);
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == ACCOUNT_DETAILS_REQUEST) {
+        if (requestCode == CATEGORY_DETAILS_REQUEST) {
 
             switch (resultCode) {
                 case Activity.RESULT_CANCELED:
@@ -211,7 +218,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mAccountAdapter.swapCursor(data);
+        mCategoryAdapter.swapCursor(data);
         if (mPosition != ListView.INVALID_POSITION) {
             // If we don't need to restart the loader, and there's a desired position to restore
             mListView.smoothScrollToPosition(mPosition);
@@ -220,7 +227,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mAccountAdapter.swapCursor(null);
+        mCategoryAdapter.swapCursor(null);
     }
 
 }
