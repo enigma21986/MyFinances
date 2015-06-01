@@ -5,13 +5,22 @@ public enum TransactionType {
     Income(2),
     Transfer(3);
 
-    private int type;
+    private int typeId;
 
-    private TransactionType(int type) {
-        this.type = type;
+    private TransactionType(int typeId) {
+        this.typeId = typeId;
     }
 
-    public int getType() {
-        return type;
+    public int getId() {
+        return typeId;
+    }
+
+    public static TransactionType getTypeById(int typeId) {
+        for (TransactionType tt : TransactionType.values()) {
+            if (tt.typeId == typeId) {
+                return tt;
+            }
+        }
+        return null;
     }
 }
