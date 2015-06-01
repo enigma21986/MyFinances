@@ -24,12 +24,10 @@ import android.widget.Toast;
 import com.mokin.myfinances.app.R;
 import com.mokin.myfinances.app.adapters.CategoryAdapter;
 import com.mokin.myfinances.app.data.MyFinancesContract;
-import com.mokin.myfinances.app.detail_views.AccountDetails;
-import com.mokin.myfinances.app.detail_views.AccountDetailsFragment;
+import com.mokin.myfinances.app.detail_views.CategoryDetails;
+import com.mokin.myfinances.app.detail_views.CategoryDetailsFragment;
 
-/**
- * Created by Alexey on 26.04.2015.
- */
+
 public class CategoryListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private CategoryAdapter mCategoryAdapter;
@@ -63,13 +61,13 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_category_list, container, false);
+        View rootView = inflater.inflate(R.layout.category_list_layout, container, false);
 
         // The CursorAdapter will take data from our cursor and populate the ListView.
         mCategoryAdapter = new CategoryAdapter(getActivity(), null, 0);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        mListView = (ListView) rootView.findViewById(R.id.listView);
+        mListView = (ListView) rootView.findViewById(R.id.category_listView);
         mListView.setEmptyView(rootView.findViewById(R.id.emptyView));
         mListView.setAdapter(mCategoryAdapter);
 
@@ -81,7 +79,7 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
-                    Uri uri = ContentUris.withAppendedId(MyFinancesContract.Category.CONTENT_URI, cursor.getLong(MyFinancesContract.Category.COL_ID_IDX));
+                    Uri uri = ContentUris.withAppendedId(MyFinancesContract.Category.CONTENT_URI, cursor.getInt(MyFinancesContract.Category.COL_ID_IDX));
                     showCategoryDetails(uri);
                 }
                 mPosition = position;
@@ -113,9 +111,9 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
     }
 
     private void showCategoryDetails(Uri uri) {
-        Intent intentAccountDetails = new Intent(getActivity(), AccountDetails.class);
-        intentAccountDetails.setData(uri);
-        startActivityForResult(intentAccountDetails, CATEGORY_DETAILS_REQUEST);
+        Intent intentCategoryDetails = new Intent(getActivity(), CategoryDetails.class);
+        intentCategoryDetails.setData(uri);
+        startActivityForResult(intentCategoryDetails, CATEGORY_DETAILS_REQUEST);
     }
 
 
@@ -128,14 +126,14 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
                     Toast.makeText(getActivity(), "Cancelled...", Toast.LENGTH_SHORT).show();
                     break;
 
-                case AccountDetailsFragment.RESULT_SAVE:
+                case CategoryDetailsFragment.RESULT_SAVE:
                     Bundle bundle = data.getExtras();
-                    saveAccount(bundle);
+                    saveCategory(bundle);
                     break;
 
-                case AccountDetailsFragment.RESULT_DELETE:
-                    long id = data.getLongExtra("id", -1);
-                    deleteAccount(id);
+                case CategoryDetailsFragment.RESULT_DELETE:
+                    int id = data.getIntExtra("id", -1);
+                    deleteCategory(id);
                     break;
 
                 default:
@@ -145,48 +143,44 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
     }
 
 
-    private void saveAccount(Bundle bundle) {
+    private void saveCategory(Bundle bundle) {
         int rows;
         ContentValues cv;
 
-        if (bundle.getLong(MyFinancesContract.Account._ID) > 0) {
-            // update account
+        if (bundle.getInt(MyFinancesContract.Category._ID) > 0) {
+            // update category
 
-            cv = getAccountContentValues(bundle);
-            rows = getActivity().getContentResolver().update(MyFinancesContract.Account.CONTENT_URI, cv, "_id = " + bundle.getLong(MyFinancesContract.Account._ID), null);
+            cv = getCategoryContentValues(bundle);
+            rows = getActivity().getContentResolver().update(MyFinancesContract.Category.CONTENT_URI, cv, "_id = " + bundle.getInt(MyFinancesContract.Category._ID), null);
 
             Toast.makeText(getActivity(), "Updated rows: " + rows, Toast.LENGTH_SHORT).show();
 
         } else {
-            // add  new account
-            //Log.d("MainActivity", "Here goes add new account...");
+            // add  new category
 
-            cv = getAccountContentValues(bundle);
-            Uri uri = getActivity().getContentResolver().insert(MyFinancesContract.Account.CONTENT_URI, cv);
+            cv = getCategoryContentValues(bundle);
+            Uri uri = getActivity().getContentResolver().insert(MyFinancesContract.Category.CONTENT_URI, cv);
 
-            long id = Long.valueOf(uri.getLastPathSegment());
+            int id = Integer.valueOf(uri.getLastPathSegment());
 
-            Toast.makeText(getActivity(), "New account added with ID = " + id, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "New category added with ID = " + id, Toast.LENGTH_SHORT).show();
         }
 
     }
 
 
-    private void deleteAccount(long id) {
-        int rows = getActivity().getContentResolver().delete(MyFinancesContract.Account.CONTENT_URI, "_id = " + id, null);
+    private void deleteCategory(int id) {
+        int rows = getActivity().getContentResolver().delete(MyFinancesContract.Category.CONTENT_URI, "_id = " + id, null);
         Toast.makeText(getActivity(), "Deleted rows: " + rows, Toast.LENGTH_SHORT).show();
     }
 
 
-    private ContentValues getAccountContentValues(Bundle bundle) {
+    private ContentValues getCategoryContentValues(Bundle bundle) {
         ContentValues cv = new ContentValues();
-/*        if (bundle.getLong(MyFinancesContract.Account._ID) > 0) {
-            cv.put(MyFinancesContract.Account._ID, bundle.getLong(MyFinancesContract.Account._ID));
-        }*/
-        cv.put(MyFinancesContract.Account.COLUMN_NAME, bundle.getString(MyFinancesContract.Account.COLUMN_NAME));
-        cv.put(MyFinancesContract.Account.COLUMN_COMMENT, bundle.getString(MyFinancesContract.Account.COLUMN_COMMENT));
+
+        cv.put(MyFinancesContract.Category.COLUMN_NAME, bundle.getString(MyFinancesContract.Category.COLUMN_NAME));
         // TODO: replace this stub
-        cv.put(MyFinancesContract.Account.COLUMN_CURRENCY_ID, bundle.getLong(MyFinancesContract.Account.COLUMN_CURRENCY_ID));
+        cv.put(MyFinancesContract.Category.COLUMN_TRANSACTION_TYPE_ID, bundle.getInt(MyFinancesContract.Category.COLUMN_TRANSACTION_TYPE_ID));
         return cv;
     }
 
@@ -206,11 +200,11 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         // Sort order:  Ascending
-        String sortOrder = MyFinancesContract.Account.COLUMN_NAME + " ASC";
+        String sortOrder = MyFinancesContract.Category.COLUMN_NAME + " ASC";
 
         return new CursorLoader(getActivity(),
-                MyFinancesContract.Account.CONTENT_URI,
-                MyFinancesContract.Account.ACCOUNT_COLUMNS,
+                MyFinancesContract.Category.CONTENT_URI,
+                MyFinancesContract.Category.CATEGORY_COLUMNS,
                 null,
                 null,
                 sortOrder);

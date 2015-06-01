@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.mokin.myfinances.app.master_views.AccountListFragment;
+import com.mokin.myfinances.app.master_views.CategoryListFragment;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -27,6 +28,7 @@ public class MainActivity extends ActionBarActivity {
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private AccountListFragment mAccountListFragment;
+    private CategoryListFragment mCategoryListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +75,12 @@ public class MainActivity extends ActionBarActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mAccountListFragment = new AccountListFragment();
+        mCategoryListFragment = new CategoryListFragment();
 
         // Initialize the first fragment when the application first loads.
         if (savedInstanceState == null) {
             selectItem(0);
         }
-
 
     }
 
@@ -102,13 +104,11 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         // Pass the event to ActionBarDrawerToggle, if it returns
         // true, then it has handled the app icon touch event
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-
 
         switch (item.getItemId()) {
             case R.id.action_settings:
@@ -136,7 +136,7 @@ public class MainActivity extends ActionBarActivity {
                 fragment = mAccountListFragment;
                 break;
             case 1:
-                //fragment = new AccountListFragment();
+                fragment = mCategoryListFragment;
                 break;
             case 2:
                 //fragment = new AccountListFragment();

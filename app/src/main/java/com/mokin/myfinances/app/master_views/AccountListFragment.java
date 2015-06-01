@@ -58,13 +58,13 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_account_list, container, false);
+        View rootView = inflater.inflate(R.layout.account_list_layout, container, false);
 
         // The CursorAdapter will take data from our cursor and populate the ListView.
         mAccountAdapter = new AccountAdapter(getActivity(), null, 0);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        mListView = (ListView) rootView.findViewById(R.id.listView);
+        mListView = (ListView) rootView.findViewById(R.id.account_listView);
         mListView.setEmptyView(rootView.findViewById(R.id.emptyView));
         mListView.setAdapter(mAccountAdapter);
 
@@ -76,7 +76,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
-                    Uri uri = ContentUris.withAppendedId(MyFinancesContract.Account.CONTENT_URI, cursor.getLong(MyFinancesContract.Account.COL_ID_IDX));
+                    Uri uri = ContentUris.withAppendedId(MyFinancesContract.Account.CONTENT_URI, cursor.getInt(MyFinancesContract.Account.COL_ID_IDX));
                     showAccountDetails(uri);
                 }
                 mPosition = position;
@@ -128,7 +128,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
                     break;
 
                 case AccountDetailsFragment.RESULT_DELETE:
-                    long id = data.getLongExtra("id", -1);
+                    int id = data.getIntExtra("id", -1);
                     deleteAccount(id);
                     break;
 
@@ -141,13 +141,12 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
 
     private void saveAccount(Bundle bundle) {
         int rows;
-        ContentValues cv;
+        ContentValues cv = getAccountContentValues(bundle);
 
-        if (bundle.getLong(MyFinancesContract.Account._ID) > 0) {
+        if (bundle.getInt(MyFinancesContract.Account._ID) > 0) {
             // update account
 
-            cv = getAccountContentValues(bundle);
-            rows = getActivity().getContentResolver().update(MyFinancesContract.Account.CONTENT_URI, cv, "_id = " + bundle.getLong(MyFinancesContract.Account._ID), null);
+            rows = getActivity().getContentResolver().update(MyFinancesContract.Account.CONTENT_URI, cv, "_id = " + bundle.getInt(MyFinancesContract.Account._ID), null);
 
             Toast.makeText(getActivity(), "Updated rows: " + rows, Toast.LENGTH_SHORT).show();
 
@@ -155,10 +154,10 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
             // add  new account
             //Log.d("MainActivity", "Here goes add new account...");
 
-            cv = getAccountContentValues(bundle);
+
             Uri uri = getActivity().getContentResolver().insert(MyFinancesContract.Account.CONTENT_URI, cv);
 
-            long id = Long.valueOf(uri.getLastPathSegment());
+            int id = Integer.valueOf(uri.getLastPathSegment());
 
             Toast.makeText(getActivity(), "New account added with ID = " + id, Toast.LENGTH_SHORT).show();
         }
@@ -166,7 +165,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
     }
 
 
-    private void deleteAccount(long id) {
+    private void deleteAccount(int id) {
         int rows = getActivity().getContentResolver().delete(MyFinancesContract.Account.CONTENT_URI, "_id = " + id, null);
         Toast.makeText(getActivity(), "Deleted rows: " + rows, Toast.LENGTH_SHORT).show();
     }
@@ -180,7 +179,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
         cv.put(MyFinancesContract.Account.COLUMN_NAME, bundle.getString(MyFinancesContract.Account.COLUMN_NAME));
         cv.put(MyFinancesContract.Account.COLUMN_COMMENT, bundle.getString(MyFinancesContract.Account.COLUMN_COMMENT));
         // TODO: replace this stub
-        cv.put(MyFinancesContract.Account.COLUMN_CURRENCY_ID, bundle.getLong(MyFinancesContract.Account.COLUMN_CURRENCY_ID));
+        cv.put(MyFinancesContract.Account.COLUMN_CURRENCY_CODE, bundle.getString(MyFinancesContract.Account.COLUMN_CURRENCY_CODE));
         return cv;
     }
 

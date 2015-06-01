@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/currency_flag"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_rub"/>
+
+    <TextView
+        android:id="@+id/currency_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:text="Russian ruble"
+        android:layout_toRightOf="@id/currency_flag"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/currency_symbol"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="₽"
+        android:layout_below="@id/currency_name"
+        android:layout_alignLeft="@id/currency_name"
+        android:fontFamily="sans-serif-condensed"
+        android:textAppearance="?android:textAppearanceSmall" />
+
+    <CheckBox
+        android:id="@+id/currency_selected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="5dp"
+        android:visibility="invisible"
+        android:enabled="false"
+        android:layout_marginRight="5dp" />
+
+</RelativeLayout>

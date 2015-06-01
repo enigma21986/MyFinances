@@ -38,7 +38,7 @@ public class AccountAdapter extends CursorAdapter {
 
         // Read data from cursor
         String accountName = cursor.getString(MyFinancesContract.Account.COL_NAME_IDX);
-        String accountCurrency = cursor.getString(MyFinancesContract.Account.COL_CURRENCY_ID_IDX);
+        String accountCurrency = cursor.getString(MyFinancesContract.Account.COL_CURRENCY_CODE_IDX);
         // Find TextView and set value on it
         viewHolder.accountName.setText(accountName);
         viewHolder.accountCurrency.setText(accountCurrency);

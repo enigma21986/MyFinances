@@ -23,7 +23,7 @@
 
     <!-- Account details view -->
     <string name="account_name_hint">Account name</string>
-    <string name="confirm_delete">Are you sure to delete the account?</string>
+    <string name="account_confirm_delete">Are you sure to delete the account?</string>
 
     <!-- Navigation drawer stuff -->
     <string-array name="drawer_array">
@@ -38,5 +38,12 @@
     <!-- Category master view -->
     <string name="category_name">New category</string>
 
+    <!-- Category details view -->
+    <string name="category_name_hint">Category name</string>
+    <string name="category_confirm_delete">Are you sure to delete the category?</string>
+
+    <!-- Currency -->
+    <string name="select_currency">Select a currency</string>
+    <string name="currency">Currency</string>
 
 </resources>

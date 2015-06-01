@@ -19,8 +19,6 @@ public class MyCustomProvider extends ContentProvider {
     private static final int CATEGORY_SEARCH = 102;
     private static final int MARKET = 200;
     private static final int MARKET_ID = 201;
-    private static final int CURRENCY = 300;
-    private static final int CURRENCY_ID = 301;
     private static final int ACCOUNT = 400;
     private static final int ACCOUNT_ID = 401;
     private static final int BUDGET = 500;
@@ -44,9 +42,6 @@ public class MyCustomProvider extends ContentProvider {
 
         matcher.addURI(authority, MyFinancesContract.PATH_MARKET, MARKET);
         matcher.addURI(authority, MyFinancesContract.PATH_MARKET + "/#", MARKET_ID);
-
-        matcher.addURI(authority, MyFinancesContract.PATH_CURRENCY, CURRENCY);
-        matcher.addURI(authority, MyFinancesContract.PATH_CURRENCY + "/#", CURRENCY_ID);
 
         matcher.addURI(authority, MyFinancesContract.PATH_ACCOUNT, ACCOUNT);
         matcher.addURI(authority, MyFinancesContract.PATH_ACCOUNT + "/#", ACCOUNT_ID);
@@ -183,30 +178,6 @@ public class MyCustomProvider extends ContentProvider {
                         MyFinancesContract.Category.TABLE_NAME,
                         projection,
                         MyFinancesContract.Category.COLUMN_NAME + " LIKE ?",
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            // "currency"
-            case CURRENCY:
-                returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Currency.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
-                break;
-            // "currency/#"
-            case CURRENCY_ID:
-                returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Currency.TABLE_NAME,
-                        projection,
-                        MyFinancesContract.Currency._ID + " = " + uri.getLastPathSegment(),
                         selectionArgs,
                         null,
                         null,

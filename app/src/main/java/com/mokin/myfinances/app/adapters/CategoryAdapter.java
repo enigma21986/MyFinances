@@ -23,12 +23,12 @@ public class CategoryAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-        View view = LayoutInflater.from(context).inflate(R.layout.category_listview_row, parent, false);
+        View rowView = LayoutInflater.from(context).inflate(R.layout.category_listview_row, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(view);
-        view.setTag(viewHolder);
+        ViewHolder viewHolder = new ViewHolder(rowView);
+        rowView.setTag(viewHolder);
 
-        return view;
+        return rowView;
     }
 
     @Override
@@ -47,8 +47,8 @@ public class CategoryAdapter extends CursorAdapter {
     /**
      * Cache of the children views for an category list item.
      */
-    public static class ViewHolder {
-        public final TextView categoryName;
+    static class ViewHolder {
+        final TextView categoryName;
 
         public ViewHolder(View view) {
             categoryName = (TextView) view.findViewById(R.id.category_name);

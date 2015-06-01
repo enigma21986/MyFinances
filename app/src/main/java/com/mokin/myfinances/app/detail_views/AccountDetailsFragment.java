@@ -17,19 +17,23 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
+import com.mokin.myfinances.app.CurrencyListDialogFragment;
 import com.mokin.myfinances.app.R;
 import com.mokin.myfinances.app.data.MyFinancesContract;
 
-/**
- * Created by Alexey on 18.04.2015.
- */
+import java.util.Currency;
+
+
 public class AccountDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private EditText mEtAccountName;
     private EditText mEtAccountComment;
-    private long mAccountId;
+    private Button mBtnAccountCurrency;
+    private int mAccountId;
+    private String mCurrencyCode;
 
     private static final int ACCOUNT_DETAIL_LOADER = 0;
     public static final int RESULT_SAVE = 100;
@@ -44,10 +48,24 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_account_detail, container, false);
+        View rootView = inflater.inflate(R.layout.account_detail_layout, container, false);
 
         mEtAccountName = (EditText) rootView.findViewById(R.id.et_account_name);
         mEtAccountComment = (EditText) rootView.findViewById(R.id.et_account_comment);
+        mBtnAccountCurrency = (Button) rootView.findViewById(R.id.btn_select_currency);
+
+        mBtnAccountCurrency.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CurrencyListDialogFragment dialog = new CurrencyListDialogFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("code", mCurrencyCode);
+
+                dialog.setArguments(bundle);
+                dialog.show(getActivity().getSupportFragmentManager(), this.getClass().getSimpleName());
+            }
+        });
 
         return rootView;
     }
@@ -89,7 +107,7 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
 
             case R.id.delete: {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage(R.string.confirm_delete);
+                builder.setMessage(R.string.account_confirm_delete);
 
                 builder.setPositiveButton(R.string.delete,
                         new DialogInterface.OnClickListener() {
@@ -121,11 +139,11 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
     private void editAccount() {
         if (!TextUtils.isEmpty(mEtAccountName.getText().toString())) {
             Bundle account = new Bundle();
-            account.putLong(MyFinancesContract.Account._ID, mAccountId);
+            account.putInt(MyFinancesContract.Account._ID, mAccountId);
             account.putString(MyFinancesContract.Account.COLUMN_NAME, mEtAccountName.getText().toString());
             account.putString(MyFinancesContract.Account.COLUMN_COMMENT, mEtAccountComment.getText().toString());
             // TODO: replace this stub
-            account.putLong(MyFinancesContract.Account.COLUMN_CURRENCY_ID, 1);
+            account.putString(MyFinancesContract.Account.COLUMN_CURRENCY_CODE, mCurrencyCode);
 
             getActivity().getIntent().putExtras(account);
 
@@ -136,6 +154,10 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
         getActivity().finish();
     }
 
+
+    public void setCurrencyCode(String code) {
+        mCurrencyCode = code;
+    }
 
 
     @Override
@@ -164,10 +186,15 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
 
         if (data != null && data.moveToFirst()) {
 
-            mAccountId = data.getLong(MyFinancesContract.Account.COL_ID_IDX);
+            mAccountId = data.getInt(MyFinancesContract.Account.COL_ID_IDX);
+
             mEtAccountName.setText(data.getString(MyFinancesContract.Account.COL_NAME_IDX));
             mEtAccountComment.setText(data.getString(MyFinancesContract.Account.COL_COMMENT_IDX));
 
+            mCurrencyCode = data.getString(MyFinancesContract.Account.COL_CURRENCY_CODE_IDX);
+
+            Currency currency = Currency.getInstance(mCurrencyCode);
+            mBtnAccountCurrency.setText(currency.getSymbol() + "(" + currency.getDisplayName() + ")");
         }
 
     }

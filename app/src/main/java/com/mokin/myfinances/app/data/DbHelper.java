@@ -5,7 +5,11 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.mokin.myfinances.app.data.MyFinancesContract.*;
+import com.mokin.myfinances.app.data.MyFinancesContract.Account;
+import com.mokin.myfinances.app.data.MyFinancesContract.Budget;
+import com.mokin.myfinances.app.data.MyFinancesContract.Category;
+import com.mokin.myfinances.app.data.MyFinancesContract.Market;
+import com.mokin.myfinances.app.data.MyFinancesContract.Transactions;
 
 /**
  * Manages a local database for MyFinances data.
@@ -15,7 +19,7 @@ public class DbHelper extends SQLiteOpenHelper {
     // DB constants.
     public static final String DB_NAME = "myfinances.db";
     // If you change the database schema, you must increment the database version.
-    public static final int DB_VERSION = 8;
+    public static final int DB_VERSION = 12;
 
 
     public DbHelper(Context context) {
@@ -30,19 +34,13 @@ public class DbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_CATEGORY_TABLE = "CREATE TABLE " + Category.TABLE_NAME + " (" +
                 Category._ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                 Category.COLUMN_NAME + " NVARCHAR NOT NULL," +
-                Category.COLUMN_TRANSACTION_TYPE_ID + " INTEGER," +
+                Category.COLUMN_TRANSACTION_TYPE_ID + " INTEGER REFERENCES " + Category.TABLE_NAME + "(" + Category._ID + ") ON DELETE SET NULL," +
                 Category.COLUMN_PARENT_ID + " INTEGER);";
-
-        final String SQL_CREATE_CURRENCY_TABLE = "CREATE TABLE " + Currency.TABLE_NAME + " (" +
-                Currency._ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
-                Currency.COLUMN_NAME + " NVARCHAR NOT NULL," +
-                Currency.COLUMN_CURRENCY_CODE + " NVARCHAR NOT NULL," +
-                Currency.COLUMN_CURRENCY_SYMBOL + " NVARCHAR);";
 
         final String SQL_CREATE_ACCOUNT_TABLE = "CREATE TABLE " + Account.TABLE_NAME + " (" +
                 Account._ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT," +
                 Account.COLUMN_NAME + " NVARCHAR NOT NULL," +
-                Account.COLUMN_CURRENCY_ID + " INTEGER NOT NULL REFERENCES " + Currency.TABLE_NAME + "(" + Currency._ID + ") ON DELETE RESTRICT," +
+                Account.COLUMN_CURRENCY_CODE + " NVARCHAR(3) NOT NULL," +
                 Account.COLUMN_COMMENT + " NVARCHAR);";
 
         final String SQL_CREATE_BUDGET_TABLE = "CREATE TABLE " + Budget.TABLE_NAME + " (" +
@@ -71,7 +69,6 @@ public class DbHelper extends SQLiteOpenHelper {
                 Market.COLUMN_COMMENT + " NVARCHAR);";
 
         // TODO: populate currency table with values from txt file ?!
-        sqLiteDatabase.execSQL(SQL_CREATE_CURRENCY_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_ACCOUNT_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_MARKET_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_CATEGORY_TABLE);
@@ -90,17 +87,20 @@ public class DbHelper extends SQLiteOpenHelper {
             sqLiteDatabase.insert(Category.TABLE_NAME, null, cv);
         }*/
 
-        cv.put(Currency.COLUMN_NAME, "Russian ruble");
-        cv.put(Currency.COLUMN_CURRENCY_CODE, "RUB");
-        sqLiteDatabase.insert(Currency.TABLE_NAME, null, cv);
+
+        for (int i = 1; i <= 3; i++) {
+            cv.put(Account.COLUMN_NAME, "Счет " + i);
+            cv.put(Account.COLUMN_CURRENCY_CODE, "RUB");
+            cv.put(Account.COLUMN_COMMENT, "Комментарий " + i);
+            sqLiteDatabase.insert(Account.TABLE_NAME, null, cv);
+        }
 
         cv.clear();
 
         for (int i = 1; i <= 3; i++) {
-            cv.put(Account.COLUMN_NAME, "Счет " + i);
-            cv.put(Account.COLUMN_CURRENCY_ID, 1);
-            cv.put(Account.COLUMN_COMMENT, "Комментарий " + i);
-            sqLiteDatabase.insert(Account.TABLE_NAME, null, cv);
+            cv.put(Category.COLUMN_NAME, "Категория " + i);
+            cv.put(Category.COLUMN_TRANSACTION_TYPE_ID, i);
+            sqLiteDatabase.insert(Category.TABLE_NAME, null, cv);
         }
 
     }
@@ -110,7 +110,6 @@ public class DbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Transactions.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Budget.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Account.TABLE_NAME);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Currency.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Category.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + Market.TABLE_NAME);
 
