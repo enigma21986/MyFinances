@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,6 +25,9 @@ import android.widget.Spinner;
 import com.mokin.myfinances.app.R;
 import com.mokin.myfinances.app.data.MyFinancesContract;
 import com.mokin.myfinances.app.data.TransactionType;
+import com.mokin.myfinances.app.utility.SpinnerData;
+
+import java.util.ArrayList;
 
 
 public class CategoryDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -35,9 +37,9 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
     private Spinner mParentCategorySpinner;
 
     private int mCategoryId;
-    //private ArrayList<String> mCategoryList = new ArrayList<>();
-    private Cursor mCategoryCursor;
-    private SimpleCursorAdapter mAdapter;
+    private ArrayList<SpinnerData> mCategoryList;
+    private ArrayAdapter<SpinnerData> mCategoryAdapter;
+    private ArrayAdapter<TransactionType> mTransactionTypeAdapter;
 
     private static final int CATEGORY_DETAIL_LOADER = 0;
     public static final int RESULT_SAVE = 100;
@@ -58,29 +60,34 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
         mParentCategorySpinner = (Spinner) rootView.findViewById(R.id.parent_category_spinner);
         mTransactionTypeSpinner = (Spinner) rootView.findViewById(R.id.transaction_type_spinner);
 
-        //ArrayAdapter<String> adapterC = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, mCategoryList);
-        //adapterC.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        //mParentCategorySpinner.setAdapter(adapterC);
+        if (mCategoryList == null) {
+            if (savedInstanceState == null){
+                mCategoryList = new ArrayList<>();
+                mCategoryList.add(new SpinnerData(0, "Root category"));
+            } else {
+                mCategoryList = (ArrayList<SpinnerData>) savedInstanceState.getSerializable("mCategoryList");
+            }
 
-        mAdapter = new SimpleCursorAdapter(
-                getActivity(), // context
-                android.R.layout.simple_spinner_item, // layout file
-                mCategoryCursor, // DB cursor
-                new String[]{MyFinancesContract.Category.COLUMN_NAME}, // data to bind to the UI
-                new int[]{android.R.id.text1}, // views that'll represent the data from "fromColumns"
-                0
-        );
-        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mParentCategorySpinner.setAdapter(mAdapter);
+        }
+
+        if (mCategoryAdapter == null) {
+            mCategoryAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, mCategoryList);
+            mCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mParentCategorySpinner.setAdapter(mCategoryAdapter);
+        }
+        // TODO: do localisation
+        mParentCategorySpinner.setPrompt("Select parent category");
 
 
         TransactionType[] data = {TransactionType.Expense, TransactionType.Income, TransactionType.Transfer};
-        ArrayAdapter<TransactionType> adapterTT = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, data);
-        adapterTT.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mTransactionTypeSpinner.setAdapter(adapterTT);
 
-        // заголовок ??
-        //mTransactionTypeSpinner.setPrompt("Select transaction type");
+        if (mTransactionTypeAdapter == null) {
+            mTransactionTypeAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, data);
+            mTransactionTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            mTransactionTypeSpinner.setAdapter(mTransactionTypeAdapter);
+        }
+        // TODO: do localisation
+        mTransactionTypeSpinner.setPrompt("Select transaction type");
 
         /*
         // устанавливаем обработчик нажатия
@@ -166,11 +173,11 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
             category.putInt(MyFinancesContract.Category._ID, mCategoryId);
             category.putString(MyFinancesContract.Category.COLUMN_NAME, mEtCategoryName.getText().toString());
 
-            category.putInt(MyFinancesContract.Category.COLUMN_PARENT_ID,
-                    ((Cursor) mParentCategorySpinner.getItemAtPosition(mParentCategorySpinner.getSelectedItemPosition())).getInt(MyFinancesContract.Category.COL_PARENT_ID_IDX));
+            int val = ((SpinnerData) mParentCategorySpinner.getItemAtPosition(mParentCategorySpinner.getSelectedItemPosition())).getKey();
+            category.putInt(MyFinancesContract.Category.COLUMN_PARENT_ID, val);
 
-            category.putInt(MyFinancesContract.Category.COLUMN_TRANSACTION_TYPE_ID,
-                    ((TransactionType) mTransactionTypeSpinner.getItemAtPosition(mTransactionTypeSpinner.getSelectedItemPosition())).getId());
+            val = ((TransactionType) mTransactionTypeSpinner.getItemAtPosition(mTransactionTypeSpinner.getSelectedItemPosition())).getId();
+            category.putInt(MyFinancesContract.Category.COLUMN_TRANSACTION_TYPE_ID, val);
 
             getActivity().getIntent().putExtras(category);
 
@@ -200,11 +207,13 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
         //return null;
     }
 
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
-        int id = -1; // id of category
-        int parentId = -1; // id of parent category
+        int id = 0; // id of category
+        int parentId = 0; // id of parent category
+        int pos = 0;
 
         Intent intent = getActivity().getIntent();
         if (intent.getData() != null){
@@ -213,32 +222,48 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
 
         if (cursor != null) {
 
-            mCategoryCursor = cursor;
-
             while (cursor.moveToNext()) {
-
-                //mCategoryList.add(cursor.getString(MyFinancesContract.Category.COL_NAME_IDX));
 
                 if (id == cursor.getInt(MyFinancesContract.Category.COL_ID_IDX)) {
                     mCategoryId = cursor.getInt(MyFinancesContract.Category.COL_ID_IDX);
                     mEtCategoryName.setText(cursor.getString(MyFinancesContract.Category.COL_NAME_IDX));
 
-                    int pos = ((ArrayAdapter<TransactionType>) mTransactionTypeSpinner.getAdapter()).getPosition(TransactionType.getTypeById(cursor.getInt(MyFinancesContract.Category.COL_TRANSACTION_TYPE_ID_IDX)));
+                    pos = mTransactionTypeAdapter.getPosition(TransactionType.getTypeById(cursor.getInt(MyFinancesContract.Category.COL_TRANSACTION_TYPE_ID_IDX)));
                     mTransactionTypeSpinner.setSelection(pos);
 
                     parentId =  cursor.getInt(MyFinancesContract.Category.COL_PARENT_ID_IDX);
-                    //mParentCategorySpinner.setSelection(0); // stub
+
+                } else {
+                    mCategoryList.add(new SpinnerData(cursor.getInt(MyFinancesContract.Category.COL_ID_IDX), cursor.getString(MyFinancesContract.Category.COL_NAME_IDX)));
+                }
+
+            }
+
+            mCategoryAdapter.notifyDataSetChanged();
+
+            for (SpinnerData category : mCategoryList) {
+                if (parentId == category.getKey()){
+                    pos = mCategoryAdapter.getPosition(category);
+                    mParentCategorySpinner.setSelection(pos);
+                    break;
                 }
             }
+
         }
-
-        // ???
-        mAdapter.notifyDataSetChanged();
-
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("mCategoryList", mCategoryList);
+    }
+
+
+
+
 }

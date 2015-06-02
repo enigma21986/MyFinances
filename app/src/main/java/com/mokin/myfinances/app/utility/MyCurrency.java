@@ -4,9 +4,7 @@ import com.mokin.myfinances.app.R;
 
 import java.util.Currency;
 
-/**
- * Created by Alexey on 01.05.2015.
- */
+
 public class MyCurrency {
     private String code;
 

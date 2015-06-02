@@ -14,9 +14,7 @@ import com.mokin.myfinances.app.utility.MyCurrency;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Alexey on 02.05.2015.
- */
+
 public class CurrencyListDialogFragment extends DialogFragment {
 
 

@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
+    android:padding="10dp"
     android:layout_margin="5dp">
 
     <EditText
@@ -15,13 +15,17 @@
         android:hint="@string/category_name_hint" />
 
     <Spinner
-        android:id="@+id/parent_category_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:id="@+id/transaction_type_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:spinnerMode="dialog" />
 
     <Spinner
-        android:id="@+id/transaction_type_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:id="@+id/parent_category_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:spinnerMode="dialog" />
 
 </LinearLayout>

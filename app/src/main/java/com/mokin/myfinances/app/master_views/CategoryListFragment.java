@@ -179,8 +179,8 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
         ContentValues cv = new ContentValues();
 
         cv.put(MyFinancesContract.Category.COLUMN_NAME, bundle.getString(MyFinancesContract.Category.COLUMN_NAME));
-        // TODO: replace this stub
         cv.put(MyFinancesContract.Category.COLUMN_TRANSACTION_TYPE_ID, bundle.getInt(MyFinancesContract.Category.COLUMN_TRANSACTION_TYPE_ID));
+        cv.put(MyFinancesContract.Category.COLUMN_PARENT_ID, bundle.getInt(MyFinancesContract.Category.COLUMN_PARENT_ID));
         return cv;
     }
 
