@@ -5,7 +5,7 @@ import android.widget.ArrayAdapter;
 
 import java.util.Map;
 
-
+// TODO: remove this class?
 public class CategorySpinnerAdapter extends ArrayAdapter {
 
     private Map<Integer, String> mObjects;
@@ -17,6 +17,6 @@ public class CategorySpinnerAdapter extends ArrayAdapter {
 
     @Override
     public long getItemId(int position) {
-        return super.getItemId(position)
+        return super.getItemId(position);
     }
 }

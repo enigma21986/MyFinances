@@ -27,8 +27,6 @@ import com.mokin.myfinances.app.R;
 import com.mokin.myfinances.app.data.MyFinancesContract;
 import com.mokin.myfinances.app.data.TransactionType;
 
-import java.util.ArrayList;
-
 
 public class CategoryDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -39,6 +37,7 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
     private int mCategoryId;
     //private ArrayList<String> mCategoryList = new ArrayList<>();
     private Cursor mCategoryCursor;
+    private SimpleCursorAdapter mAdapter;
 
     private static final int CATEGORY_DETAIL_LOADER = 0;
     public static final int RESULT_SAVE = 100;
@@ -63,7 +62,7 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
         //adapterC.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //mParentCategorySpinner.setAdapter(adapterC);
 
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+        mAdapter = new SimpleCursorAdapter(
                 getActivity(), // context
                 android.R.layout.simple_spinner_item, // layout file
                 mCategoryCursor, // DB cursor
@@ -71,8 +70,9 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
                 new int[]{android.R.id.text1}, // views that'll represent the data from "fromColumns"
                 0
         );
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mParentCategorySpinner.setAdapter(adapter);
+        mAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mParentCategorySpinner.setAdapter(mAdapter);
+
 
         TransactionType[] data = {TransactionType.Expense, TransactionType.Income, TransactionType.Transfer};
         ArrayAdapter<TransactionType> adapterTT = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, data);
@@ -165,7 +165,9 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
             Bundle category = new Bundle();
             category.putInt(MyFinancesContract.Category._ID, mCategoryId);
             category.putString(MyFinancesContract.Category.COLUMN_NAME, mEtCategoryName.getText().toString());
-            //category.putInt(MyFinancesContract.Category.COLUMN_PARENT_ID, mParentCategorySpinner.getSelectedItemPosition());
+
+            category.putInt(MyFinancesContract.Category.COLUMN_PARENT_ID,
+                    ((Cursor) mParentCategorySpinner.getItemAtPosition(mParentCategorySpinner.getSelectedItemPosition())).getInt(MyFinancesContract.Category.COL_PARENT_ID_IDX));
 
             category.putInt(MyFinancesContract.Category.COLUMN_TRANSACTION_TYPE_ID,
                     ((TransactionType) mTransactionTypeSpinner.getItemAtPosition(mTransactionTypeSpinner.getSelectedItemPosition())).getId());
@@ -183,7 +185,6 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         //Intent intent = getActivity().getIntent();
-
         //if (intent.getData() != null) {
 
             return new CursorLoader(
@@ -196,9 +197,6 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
                     null
             );
        // }
-
-
-
         //return null;
     }
 
@@ -229,10 +227,13 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
                     mTransactionTypeSpinner.setSelection(pos);
 
                     parentId =  cursor.getInt(MyFinancesContract.Category.COL_PARENT_ID_IDX);
-                    mParentCategorySpinner.setSelection(0); // stub
+                    //mParentCategorySpinner.setSelection(0); // stub
                 }
             }
         }
+
+        // ???
+        mAdapter.notifyDataSetChanged();
 
     }
 
