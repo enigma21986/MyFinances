@@ -182,16 +182,16 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
-        if (data != null && data.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
 
-            mAccountId = data.getInt(MyFinancesContract.Account.COL_ID_IDX);
+            mAccountId = cursor.getInt(MyFinancesContract.Account.COL_ID_IDX);
 
-            mEtAccountName.setText(data.getString(MyFinancesContract.Account.COL_NAME_IDX));
-            mEtAccountComment.setText(data.getString(MyFinancesContract.Account.COL_COMMENT_IDX));
+            mEtAccountName.setText(cursor.getString(MyFinancesContract.Account.COL_NAME_IDX));
+            mEtAccountComment.setText(cursor.getString(MyFinancesContract.Account.COL_COMMENT_IDX));
 
-            mCurrencyCode = data.getString(MyFinancesContract.Account.COL_CURRENCY_CODE_IDX);
+            mCurrencyCode = cursor.getString(MyFinancesContract.Account.COL_CURRENCY_CODE_IDX);
 
             Currency currency = Currency.getInstance(mCurrencyCode);
             mBtnAccountCurrency.setText(currency.getSymbol() + "(" + currency.getDisplayName() + ")");

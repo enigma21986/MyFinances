@@ -60,37 +60,34 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
         mParentCategorySpinner = (Spinner) rootView.findViewById(R.id.parent_category_spinner);
         mTransactionTypeSpinner = (Spinner) rootView.findViewById(R.id.transaction_type_spinner);
 
-        if (mCategoryList == null) {
-            if (savedInstanceState == null){
-                mCategoryList = new ArrayList<>();
-                mCategoryList.add(new SpinnerData(0, "Root category"));
-            } else {
-                mCategoryList = (ArrayList<SpinnerData>) savedInstanceState.getSerializable("mCategoryList");
-            }
-
+        Intent intent = getActivity().getIntent();
+        if (intent.getData() != null){
+            mCategoryId = (int) ContentUris.parseId(intent.getData());
         }
 
-        if (mCategoryAdapter == null) {
-            mCategoryAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, mCategoryList);
-            mCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            mParentCategorySpinner.setAdapter(mCategoryAdapter);
+        if (savedInstanceState == null){
+            mCategoryList = new ArrayList<>();
+            mCategoryList.add(new SpinnerData(0, "Root category"));
+        } else {
+            mCategoryList = (ArrayList<SpinnerData>) savedInstanceState.getSerializable("mCategoryList");
         }
+
+        mCategoryAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, mCategoryList);
+        mCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mParentCategorySpinner.setAdapter(mCategoryAdapter);
+
         // TODO: do localisation
         mParentCategorySpinner.setPrompt("Select parent category");
 
-
         TransactionType[] data = {TransactionType.Expense, TransactionType.Income, TransactionType.Transfer};
+        mTransactionTypeAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, data);
+        mTransactionTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mTransactionTypeSpinner.setAdapter(mTransactionTypeAdapter);
 
-        if (mTransactionTypeAdapter == null) {
-            mTransactionTypeAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, data);
-            mTransactionTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            mTransactionTypeSpinner.setAdapter(mTransactionTypeAdapter);
-        }
         // TODO: do localisation
         mTransactionTypeSpinner.setPrompt("Select transaction type");
 
         /*
-        // устанавливаем обработчик нажатия
         mTransactionTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -190,10 +187,6 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-        //Intent intent = getActivity().getIntent();
-        //if (intent.getData() != null) {
-
             return new CursorLoader(
                     getActivity(),
                     MyFinancesContract.Category.CONTENT_URI,
@@ -203,29 +196,20 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
                     null,
                     null
             );
-       // }
-        //return null;
     }
 
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
-        int id = 0; // id of category
         int parentId = 0; // id of parent category
         int pos = 0;
-
-        Intent intent = getActivity().getIntent();
-        if (intent.getData() != null){
-            id = (int) ContentUris.parseId(intent.getData());
-        }
 
         if (cursor != null) {
 
             while (cursor.moveToNext()) {
+                if (mCategoryId == cursor.getInt(MyFinancesContract.Category.COL_ID_IDX)) {
 
-                if (id == cursor.getInt(MyFinancesContract.Category.COL_ID_IDX)) {
-                    mCategoryId = cursor.getInt(MyFinancesContract.Category.COL_ID_IDX);
                     mEtCategoryName.setText(cursor.getString(MyFinancesContract.Category.COL_NAME_IDX));
 
                     pos = mTransactionTypeAdapter.getPosition(TransactionType.getTypeById(cursor.getInt(MyFinancesContract.Category.COL_TRANSACTION_TYPE_ID_IDX)));
