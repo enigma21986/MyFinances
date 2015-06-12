@@ -5,7 +5,8 @@ import android.support.v7.app.ActionBarActivity;
 
 import com.mokin.myfinances.app.R;
 
-public class CategoryDetails extends ActionBarActivity {
+
+public class TransactionDetails extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -14,7 +15,7 @@ public class CategoryDetails extends ActionBarActivity {
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.detail_container, new CategoryDetailsFragment())
+                    .add(R.id.detail_container, new TransactionDetailsFragment())
                     .commit();
         }
 

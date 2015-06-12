@@ -5,11 +5,13 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.mokin.myfinances.app.data.MyFinancesContract.Account;
-import com.mokin.myfinances.app.data.MyFinancesContract.Budget;
-import com.mokin.myfinances.app.data.MyFinancesContract.Category;
-import com.mokin.myfinances.app.data.MyFinancesContract.Market;
-import com.mokin.myfinances.app.data.MyFinancesContract.Transactions;
+import com.mokin.myfinances.app.data.FinContract.Account;
+import com.mokin.myfinances.app.data.FinContract.Budget;
+import com.mokin.myfinances.app.data.FinContract.Category;
+import com.mokin.myfinances.app.data.FinContract.Market;
+import com.mokin.myfinances.app.data.FinContract.Transactions;
+
+import java.util.Calendar;
 
 /**
  * Manages a local database for MyFinances data.
@@ -19,7 +21,7 @@ public class DbHelper extends SQLiteOpenHelper {
     // DB constants.
     public static final String DB_NAME = "myfinances.db";
     // If you change the database schema, you must increment the database version.
-    public static final int DB_VERSION = 12;
+    public static final int DB_VERSION = 13;
 
 
     public DbHelper(Context context) {
@@ -101,6 +103,22 @@ public class DbHelper extends SQLiteOpenHelper {
             cv.put(Category.COLUMN_NAME, "Категория " + i);
             cv.put(Category.COLUMN_TRANSACTION_TYPE_ID, i);
             sqLiteDatabase.insert(Category.TABLE_NAME, null, cv);
+        }
+
+
+        cv.clear();
+
+        Calendar c = Calendar.getInstance();
+        int utcOffset = c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET);
+        Long utcMilliseconds = c.getTimeInMillis() + utcOffset;
+
+        for (int i = 1; i <= 2; i++) {
+            cv.put(Transactions.COLUMN_TRANSACTION_DATETIME, utcMilliseconds);
+            cv.put(Transactions.COLUMN_TRANSACTION_AMOUNT, 100*i);
+            cv.put(Transactions.COLUMN_ACCOUNT_ID, i);
+            cv.put(Transactions.COLUMN_TRANSACTION_TYPE_ID, i);
+
+            sqLiteDatabase.insert(Transactions.TABLE_NAME, null, cv);
         }
 
     }

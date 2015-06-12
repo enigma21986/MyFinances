@@ -33,24 +33,24 @@ public class MyCustomProvider extends ContentProvider {
         // found.  The code passed into the constructor represents the code to return for the root
         // URI.  It's common to use NO_MATCH as the code for this case.
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
-        final String authority = MyFinancesContract.CONTENT_AUTHORITY;
+        final String authority = FinContract.CONTENT_AUTHORITY;
 
         // For each type of URI you want to add, create a corresponding code.
-        matcher.addURI(authority, MyFinancesContract.PATH_CATEGORY, CATEGORY);
-        matcher.addURI(authority, MyFinancesContract.PATH_CATEGORY + "/#", CATEGORY_ID);
-        matcher.addURI(authority, MyFinancesContract.PATH_CATEGORY + "/*", CATEGORY_SEARCH);
+        matcher.addURI(authority, FinContract.PATH_CATEGORY, CATEGORY);
+        matcher.addURI(authority, FinContract.PATH_CATEGORY + "/#", CATEGORY_ID);
+        matcher.addURI(authority, FinContract.PATH_CATEGORY + "/*", CATEGORY_SEARCH);
 
-        matcher.addURI(authority, MyFinancesContract.PATH_MARKET, MARKET);
-        matcher.addURI(authority, MyFinancesContract.PATH_MARKET + "/#", MARKET_ID);
+        matcher.addURI(authority, FinContract.PATH_MARKET, MARKET);
+        matcher.addURI(authority, FinContract.PATH_MARKET + "/#", MARKET_ID);
 
-        matcher.addURI(authority, MyFinancesContract.PATH_ACCOUNT, ACCOUNT);
-        matcher.addURI(authority, MyFinancesContract.PATH_ACCOUNT + "/#", ACCOUNT_ID);
+        matcher.addURI(authority, FinContract.PATH_ACCOUNT, ACCOUNT);
+        matcher.addURI(authority, FinContract.PATH_ACCOUNT + "/#", ACCOUNT_ID);
 
-        matcher.addURI(authority, MyFinancesContract.PATH_BUDGET, BUDGET);
-        matcher.addURI(authority, MyFinancesContract.PATH_BUDGET + "/#", BUDGET_ID);
+        matcher.addURI(authority, FinContract.PATH_BUDGET, BUDGET);
+        matcher.addURI(authority, FinContract.PATH_BUDGET + "/#", BUDGET_ID);
 
-        matcher.addURI(authority, MyFinancesContract.PATH_TRANSACTION, TRANSACTION);
-        matcher.addURI(authority, MyFinancesContract.PATH_TRANSACTION + "/#", TRANSACTION_ID);
+        matcher.addURI(authority, FinContract.PATH_TRANSACTION, TRANSACTION);
+        matcher.addURI(authority, FinContract.PATH_TRANSACTION + "/#", TRANSACTION_ID);
 
         return matcher;
     }
@@ -71,29 +71,29 @@ public class MyCustomProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case CATEGORY:
-                _id = db.insert(MyFinancesContract.Category.TABLE_NAME, null, values);
+                _id = db.insert(FinContract.Category.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = ContentUris.withAppendedId(MyFinancesContract.Category.CONTENT_URI, _id);
+                    returnUri = ContentUris.withAppendedId(FinContract.Category.CONTENT_URI, _id);
                 break;
             case MARKET:
-                _id = db.insert(MyFinancesContract.Market.TABLE_NAME, null, values);
+                _id = db.insert(FinContract.Market.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = ContentUris.withAppendedId(MyFinancesContract.Market.CONTENT_URI, _id);
+                    returnUri = ContentUris.withAppendedId(FinContract.Market.CONTENT_URI, _id);
                 break;
             case ACCOUNT:
-                _id = db.insert(MyFinancesContract.Account.TABLE_NAME, null, values);
+                _id = db.insert(FinContract.Account.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = ContentUris.withAppendedId(MyFinancesContract.Account.CONTENT_URI, _id);
+                    returnUri = ContentUris.withAppendedId(FinContract.Account.CONTENT_URI, _id);
                 break;
             case BUDGET:
-                _id = db.insert(MyFinancesContract.Budget.TABLE_NAME, null, values);
+                _id = db.insert(FinContract.Budget.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = ContentUris.withAppendedId(MyFinancesContract.Budget.CONTENT_URI, _id);
+                    returnUri = ContentUris.withAppendedId(FinContract.Budget.CONTENT_URI, _id);
                 break;
             case TRANSACTION:
-                _id = db.insert(MyFinancesContract.Transactions.TABLE_NAME, null, values);
+                _id = db.insert(FinContract.Transactions.TABLE_NAME, null, values);
                 if (_id > 0)
-                    returnUri = ContentUris.withAppendedId(MyFinancesContract.Transactions.CONTENT_URI, _id);
+                    returnUri = ContentUris.withAppendedId(FinContract.Transactions.CONTENT_URI, _id);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -113,19 +113,19 @@ public class MyCustomProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case CATEGORY:
-                rowsDeleted = db.delete(MyFinancesContract.Category.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(FinContract.Category.TABLE_NAME, selection, selectionArgs);
                 break;
             case MARKET:
-                rowsDeleted = db.delete(MyFinancesContract.Market.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(FinContract.Market.TABLE_NAME, selection, selectionArgs);
                 break;
             case ACCOUNT:
-                rowsDeleted = db.delete(MyFinancesContract.Account.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(FinContract.Account.TABLE_NAME, selection, selectionArgs);
                 break;
             case BUDGET:
-                rowsDeleted = db.delete(MyFinancesContract.Budget.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(FinContract.Budget.TABLE_NAME, selection, selectionArgs);
                 break;
             case TRANSACTION:
-                rowsDeleted = db.delete(MyFinancesContract.Transactions.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = db.delete(FinContract.Transactions.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -151,7 +151,7 @@ public class MyCustomProvider extends ContentProvider {
             // "category"
             case CATEGORY:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Category.TABLE_NAME,
+                        FinContract.Category.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -163,9 +163,9 @@ public class MyCustomProvider extends ContentProvider {
             // "category/#"
             case CATEGORY_ID:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Category.TABLE_NAME,
+                        FinContract.Category.TABLE_NAME,
                         projection,
-                        MyFinancesContract.Category._ID + " = " + uri.getLastPathSegment(),
+                        FinContract.Category._ID + " = " + uri.getLastPathSegment(),
                         selectionArgs,
                         null,
                         null,
@@ -175,9 +175,9 @@ public class MyCustomProvider extends ContentProvider {
             // "category/*"
             case CATEGORY_SEARCH:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Category.TABLE_NAME,
+                        FinContract.Category.TABLE_NAME,
                         projection,
-                        MyFinancesContract.Category.COLUMN_NAME + " LIKE ?",
+                        FinContract.Category.COLUMN_NAME + " LIKE ?",
                         selectionArgs,
                         null,
                         null,
@@ -187,7 +187,7 @@ public class MyCustomProvider extends ContentProvider {
             // "market"
             case MARKET:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Market.TABLE_NAME,
+                        FinContract.Market.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -199,9 +199,9 @@ public class MyCustomProvider extends ContentProvider {
             // "market/#"
             case MARKET_ID:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Market.TABLE_NAME,
+                        FinContract.Market.TABLE_NAME,
                         projection,
-                        MyFinancesContract.Market._ID + " = " + uri.getLastPathSegment(),
+                        FinContract.Market._ID + " = " + uri.getLastPathSegment(),
                         selectionArgs,
                         null,
                         null,
@@ -211,7 +211,7 @@ public class MyCustomProvider extends ContentProvider {
             // "account"
             case ACCOUNT:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Account.TABLE_NAME,
+                        FinContract.Account.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -223,9 +223,9 @@ public class MyCustomProvider extends ContentProvider {
             // "account/#"
             case ACCOUNT_ID:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Account.TABLE_NAME,
+                        FinContract.Account.TABLE_NAME,
                         projection,
-                        MyFinancesContract.Account._ID + " = " + uri.getLastPathSegment(),
+                        FinContract.Account._ID + " = " + uri.getLastPathSegment(),
                         selectionArgs,
                         null,
                         null,
@@ -235,7 +235,7 @@ public class MyCustomProvider extends ContentProvider {
             // "budget"
             case BUDGET:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Budget.TABLE_NAME,
+                        FinContract.Budget.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -247,9 +247,9 @@ public class MyCustomProvider extends ContentProvider {
             // "budget/#"
             case BUDGET_ID:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Budget.TABLE_NAME,
+                        FinContract.Budget.TABLE_NAME,
                         projection,
-                        MyFinancesContract.Budget._ID + " = " + uri.getLastPathSegment(),
+                        FinContract.Budget._ID + " = " + uri.getLastPathSegment(),
                         selectionArgs,
                         null,
                         null,
@@ -259,7 +259,7 @@ public class MyCustomProvider extends ContentProvider {
             // "transaction"
             case TRANSACTION:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Transactions.TABLE_NAME,
+                        FinContract.Transactions.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -271,9 +271,9 @@ public class MyCustomProvider extends ContentProvider {
             // "transaction/#"
             case TRANSACTION_ID:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
-                        MyFinancesContract.Transactions.TABLE_NAME,
+                        FinContract.Transactions.TABLE_NAME,
                         projection,
-                        MyFinancesContract.Transactions._ID + " = " + uri.getLastPathSegment(),
+                        FinContract.Transactions._ID + " = " + uri.getLastPathSegment(),
                         selectionArgs,
                         null,
                         null,
@@ -294,19 +294,19 @@ public class MyCustomProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case CATEGORY:
-                rowsUpdated = db.update(MyFinancesContract.Category.TABLE_NAME, values, selection, selectionArgs);
+                rowsUpdated = db.update(FinContract.Category.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case MARKET:
-                rowsUpdated = db.update(MyFinancesContract.Market.TABLE_NAME, values, selection, selectionArgs);
+                rowsUpdated = db.update(FinContract.Market.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case TRANSACTION:
-                rowsUpdated = db.update(MyFinancesContract.Transactions.TABLE_NAME, values, selection, selectionArgs);
+                rowsUpdated = db.update(FinContract.Transactions.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case ACCOUNT:
-                rowsUpdated = db.update(MyFinancesContract.Account.TABLE_NAME, values, selection, selectionArgs);
+                rowsUpdated = db.update(FinContract.Account.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case BUDGET:
-                rowsUpdated = db.update(MyFinancesContract.Budget.TABLE_NAME, values, selection, selectionArgs);
+                rowsUpdated = db.update(FinContract.Budget.TABLE_NAME, values, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);

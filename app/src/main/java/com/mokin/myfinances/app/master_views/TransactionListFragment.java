@@ -2,7 +2,6 @@ package com.mokin.myfinances.app.master_views;
 
 import android.app.Activity;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -22,40 +21,34 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.mokin.myfinances.app.R;
-import com.mokin.myfinances.app.adapters.CategoryAdapter;
+import com.mokin.myfinances.app.adapters.TransactionAdapter;
 import com.mokin.myfinances.app.data.FinContract;
-import com.mokin.myfinances.app.detail_views.CategoryDetails;
 import com.mokin.myfinances.app.detail_views.CategoryDetailsFragment;
+import com.mokin.myfinances.app.detail_views.TransactionDetails;
 
 
-public class CategoryListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TransactionListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>  {
 
-    private CategoryAdapter mCategoryAdapter;
+    private TransactionAdapter mTransactionAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
 
     private static final String SELECTED_KEY = "selected_position";
 
-    public static int CATEGORY_DETAILS_REQUEST = 1;
-    private static final int CATEGORY_LOADER = 0;
+    public static int DETAILS_REQUEST = 1;
+    private static final int TRANSACTIONS_LOADER = 0;
 
 
-    public CategoryListFragment() {
-        setHasOptionsMenu(true);
+    public TransactionListFragment() {
+        //setHasOptionsMenu(true);
     }
-
-    /*@Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: To check whether it can be moved to constructor or not
-        setHasOptionsMenu(true);
-    }*/
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(CATEGORY_LOADER, null, this);
+        getLoaderManager().initLoader(TRANSACTIONS_LOADER, null, this);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,12 +57,12 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
         View rootView = inflater.inflate(R.layout.general_list_layout, container, false);
 
         // The CursorAdapter will take data from our cursor and populate the ListView.
-        mCategoryAdapter = new CategoryAdapter(getActivity(), null, 0);
+        mTransactionAdapter = new TransactionAdapter(getActivity(), null, 0);
 
         // Get a reference to the ListView, and attach this adapter to it.
         mListView = (ListView) rootView.findViewById(R.id.listView);
         mListView.setEmptyView(rootView.findViewById(R.id.emptyView));
-        mListView.setAdapter(mCategoryAdapter);
+        mListView.setAdapter(mTransactionAdapter);
 
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -79,8 +72,19 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
-                    Uri uri = ContentUris.withAppendedId(FinContract.Category.CONTENT_URI, cursor.getInt(FinContract.Category.COL_ID_IDX));
-                    showCategoryDetails(uri);
+                    Uri uri = ContentUris.withAppendedId(FinContract.Transactions.CONTENT_URI, cursor.getInt(FinContract.Transactions.COL_ID_IDX));
+                    //showTransactionDetails(uri);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(FinContract.Transactions._ID, cursor.getInt(FinContract.Transactions.COL_ID_IDX));
+                    bundle.putString(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME, cursor.getString(FinContract.Transactions.COL_TRANSACTION_DATETIME_IDX));
+                    bundle.putDouble(FinContract.Transactions.COLUMN_TRANSACTION_AMOUNT, cursor.getDouble(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX));
+                    bundle.putInt(FinContract.Transactions.COLUMN_ACCOUNT_ID, cursor.getInt(FinContract.Transactions.COL_ACCOUNT_ID_IDX));
+                    bundle.putInt(FinContract.Transactions.COLUMN_TRANSACTION_TYPE_ID, cursor.getInt(FinContract.Transactions.COL_TRANSACTION_TYPE_ID_IDX));
+                    bundle.putInt(FinContract.Transactions.COLUMN_CATEGORY_ID, cursor.getInt(FinContract.Transactions.COL_CATEGORY_ID_IDX));
+                    bundle.putString(FinContract.Transactions.COLUMN_COMMENT, cursor.getString(FinContract.Transactions.COL_COMMENT_IDX));
+
+                    showTransactionDetails(bundle);
                 }
                 mPosition = position;
             }
@@ -93,6 +97,7 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
         return rootView;
     }
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // TODO: change?
@@ -104,22 +109,24 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
 
         switch (item.getItemId()) {
             case R.id.add_new:
-                showCategoryDetails(null);
+                showTransactionDetails(null);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void showCategoryDetails(Uri uri) {
-        Intent intentCategoryDetails = new Intent(getActivity(), CategoryDetails.class);
-        intentCategoryDetails.setData(uri);
-        startActivityForResult(intentCategoryDetails, CATEGORY_DETAILS_REQUEST);
+
+    private void showTransactionDetails(Bundle bundle) {
+        Intent intentDetails = new Intent(getActivity(), TransactionDetails.class);
+        //intentDetails.setData(uri);
+        intentDetails.putExtras(bundle);
+        startActivityForResult(intentDetails, DETAILS_REQUEST);
     }
 
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CATEGORY_DETAILS_REQUEST) {
+        if (requestCode == DETAILS_REQUEST) {
 
             switch (resultCode) {
                 case Activity.RESULT_CANCELED:
@@ -128,12 +135,12 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
 
                 case CategoryDetailsFragment.RESULT_SAVE:
                     Bundle bundle = data.getExtras();
-                    saveCategory(bundle);
+                    saveTransaction(bundle);
                     break;
 
                 case CategoryDetailsFragment.RESULT_DELETE:
                     int id = data.getIntExtra("id", -1);
-                    deleteCategory(id);
+                    deleteTransaction(id);
                     break;
 
                 default:
@@ -142,69 +149,23 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
         }
     }
 
-
-    private void saveCategory(Bundle bundle) {
-        int rows;
-        ContentValues cv;
-
-        if (bundle.getInt(FinContract.Category._ID) > 0) {
-            // update category
-
-            cv = getCategoryContentValues(bundle);
-            rows = getActivity().getContentResolver().update(FinContract.Category.CONTENT_URI, cv, "_id = " + bundle.getInt(FinContract.Category._ID), null);
-
-            Toast.makeText(getActivity(), "Updated rows: " + rows, Toast.LENGTH_SHORT).show();
-
-        } else {
-            // add  new category
-
-            cv = getCategoryContentValues(bundle);
-            Uri uri = getActivity().getContentResolver().insert(FinContract.Category.CONTENT_URI, cv);
-
-            int id = Integer.valueOf(uri.getLastPathSegment());
-
-            Toast.makeText(getActivity(), "New category added with ID = " + id, Toast.LENGTH_SHORT).show();
-        }
+    private void saveTransaction(Bundle bundle) {
 
     }
 
+    private void deleteTransaction(int id) {
 
-    private void deleteCategory(int id) {
-        int rows = getActivity().getContentResolver().delete(FinContract.Category.CONTENT_URI, "_id = " + id, null);
-        Toast.makeText(getActivity(), "Deleted rows: " + rows, Toast.LENGTH_SHORT).show();
-    }
-
-
-    private ContentValues getCategoryContentValues(Bundle bundle) {
-        ContentValues cv = new ContentValues();
-
-        cv.put(FinContract.Category.COLUMN_NAME, bundle.getString(FinContract.Category.COLUMN_NAME));
-        cv.put(FinContract.Category.COLUMN_TRANSACTION_TYPE_ID, bundle.getInt(FinContract.Category.COLUMN_TRANSACTION_TYPE_ID));
-        cv.put(FinContract.Category.COLUMN_PARENT_ID, bundle.getInt(FinContract.Category.COLUMN_PARENT_ID));
-        return cv;
     }
 
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        // When tablets rotate, the currently selected list item needs to be saved.
-        // When no item is selected, mPosition will be set to Listview.INVALID_POSITION,
-        // so check for that before storing.
-        if (mPosition != ListView.INVALID_POSITION) {
-            outState.putInt(SELECTED_KEY, mPosition);
-        }
-        super.onSaveInstanceState(outState);
-    }
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
-        // Sort order:  Ascending
-        String sortOrder = FinContract.Category.COLUMN_NAME + " ASC";
+        String sortOrder = FinContract.Transactions.COLUMN_TRANSACTION_DATETIME + " ASC";
 
         return new CursorLoader(getActivity(),
-                FinContract.Category.CONTENT_URI,
-                FinContract.Category.CATEGORY_COLUMNS,
+                FinContract.Transactions.CONTENT_URI,
+                FinContract.Transactions.TRANSACTION_COLUMNS,
                 null,
                 null,
                 sortOrder);
@@ -212,7 +173,7 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCategoryAdapter.swapCursor(data);
+        mTransactionAdapter.swapCursor(data);
         if (mPosition != ListView.INVALID_POSITION) {
             // If we don't need to restart the loader, and there's a desired position to restore
             mListView.smoothScrollToPosition(mPosition);
@@ -221,7 +182,6 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mCategoryAdapter.swapCursor(null);
+        mTransactionAdapter.swapCursor(null);
     }
-
 }

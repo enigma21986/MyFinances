@@ -22,7 +22,7 @@ import android.widget.EditText;
 
 import com.mokin.myfinances.app.CurrencyListDialogFragment;
 import com.mokin.myfinances.app.R;
-import com.mokin.myfinances.app.data.MyFinancesContract;
+import com.mokin.myfinances.app.data.FinContract;
 
 import java.util.Currency;
 
@@ -139,11 +139,11 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
     private void editAccount() {
         if (!TextUtils.isEmpty(mEtAccountName.getText().toString())) {
             Bundle account = new Bundle();
-            account.putInt(MyFinancesContract.Account._ID, mAccountId);
-            account.putString(MyFinancesContract.Account.COLUMN_NAME, mEtAccountName.getText().toString());
-            account.putString(MyFinancesContract.Account.COLUMN_COMMENT, mEtAccountComment.getText().toString());
+            account.putInt(FinContract.Account._ID, mAccountId);
+            account.putString(FinContract.Account.COLUMN_NAME, mEtAccountName.getText().toString());
+            account.putString(FinContract.Account.COLUMN_COMMENT, mEtAccountComment.getText().toString());
             // TODO: replace this stub
-            account.putString(MyFinancesContract.Account.COLUMN_CURRENCY_CODE, mCurrencyCode);
+            account.putString(FinContract.Account.COLUMN_CURRENCY_CODE, mCurrencyCode);
 
             getActivity().getIntent().putExtras(account);
 
@@ -172,7 +172,7 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
             return new CursorLoader(
                     getActivity(),
                     intent.getData(),
-                    MyFinancesContract.Account.ACCOUNT_COLUMNS,
+                    FinContract.Account.ACCOUNT_COLUMNS,
                     null,
                     null,
                     null
@@ -186,12 +186,12 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
 
         if (cursor != null && cursor.moveToFirst()) {
 
-            mAccountId = cursor.getInt(MyFinancesContract.Account.COL_ID_IDX);
+            mAccountId = cursor.getInt(FinContract.Account.COL_ID_IDX);
 
-            mEtAccountName.setText(cursor.getString(MyFinancesContract.Account.COL_NAME_IDX));
-            mEtAccountComment.setText(cursor.getString(MyFinancesContract.Account.COL_COMMENT_IDX));
+            mEtAccountName.setText(cursor.getString(FinContract.Account.COL_NAME_IDX));
+            mEtAccountComment.setText(cursor.getString(FinContract.Account.COL_COMMENT_IDX));
 
-            mCurrencyCode = cursor.getString(MyFinancesContract.Account.COL_CURRENCY_CODE_IDX);
+            mCurrencyCode = cursor.getString(FinContract.Account.COL_CURRENCY_CODE_IDX);
 
             Currency currency = Currency.getInstance(mCurrencyCode);
             mBtnAccountCurrency.setText(currency.getSymbol() + "(" + currency.getDisplayName() + ")");

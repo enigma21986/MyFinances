@@ -16,6 +16,7 @@
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="add_new">Add</string>
+    <string name="price">1000</string>
 
     <!-- Account master view -->
     <string name="account_name">New account</string>
@@ -45,5 +46,8 @@
     <!-- Currency -->
     <string name="select_currency">Select a currency</string>
     <string name="currency">Currency</string>
+
+    <!-- Transaction details view -->
+    <string name="transaction_confirm_delete">Are you sure to delete the transaction?</string>
 
 </resources>

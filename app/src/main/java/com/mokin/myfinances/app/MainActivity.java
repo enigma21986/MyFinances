@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import com.mokin.myfinances.app.master_views.AccountListFragment;
 import com.mokin.myfinances.app.master_views.CategoryListFragment;
+import com.mokin.myfinances.app.master_views.TransactionListFragment;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -29,6 +30,7 @@ public class MainActivity extends ActionBarActivity {
     private CharSequence mTitle;
     private AccountListFragment mAccountListFragment;
     private CategoryListFragment mCategoryListFragment;
+    private TransactionListFragment mTransactionListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,7 @@ public class MainActivity extends ActionBarActivity {
 
         mAccountListFragment = new AccountListFragment();
         mCategoryListFragment = new CategoryListFragment();
+        mTransactionListFragment = new TransactionListFragment();
 
         // Initialize the first fragment when the application first loads.
         if (savedInstanceState == null) {
@@ -139,7 +142,7 @@ public class MainActivity extends ActionBarActivity {
                 fragment = mCategoryListFragment;
                 break;
             case 2:
-                //fragment = new AccountListFragment();
+                fragment = mTransactionListFragment;
                 break;
             default:
                 break;

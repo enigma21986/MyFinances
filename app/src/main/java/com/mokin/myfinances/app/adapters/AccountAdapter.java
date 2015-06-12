@@ -9,11 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.mokin.myfinances.app.R;
-import com.mokin.myfinances.app.data.MyFinancesContract;
+import com.mokin.myfinances.app.data.FinContract;
 
-/**
- * Created by Alexey on 08.04.2015.
- */
+
 public class AccountAdapter extends CursorAdapter {
 
     public AccountAdapter(Context context, Cursor c, int flags) {
@@ -37,8 +35,8 @@ public class AccountAdapter extends CursorAdapter {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         // Read data from cursor
-        String accountName = cursor.getString(MyFinancesContract.Account.COL_NAME_IDX);
-        String accountCurrency = cursor.getString(MyFinancesContract.Account.COL_CURRENCY_CODE_IDX);
+        String accountName = cursor.getString(FinContract.Account.COL_NAME_IDX);
+        String accountCurrency = cursor.getString(FinContract.Account.COL_CURRENCY_CODE_IDX);
         // Find TextView and set value on it
         viewHolder.accountName.setText(accountName);
         viewHolder.accountCurrency.setText(accountCurrency);

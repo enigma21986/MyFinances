@@ -15,11 +15,11 @@ public class AccountDetails extends ActionBarActivity implements CurrencyListDia
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.account_detail_fragment);
+        setContentView(R.layout.general_detail_layout);
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.account_detail_container, new AccountDetailsFragment())
+                    .add(R.id.detail_container, new AccountDetailsFragment())
                     .commit();
         }
 

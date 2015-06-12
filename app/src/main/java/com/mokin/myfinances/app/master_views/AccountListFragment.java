@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 import com.mokin.myfinances.app.R;
 import com.mokin.myfinances.app.adapters.AccountAdapter;
-import com.mokin.myfinances.app.data.MyFinancesContract;
+import com.mokin.myfinances.app.data.FinContract;
 import com.mokin.myfinances.app.detail_views.AccountDetails;
 import com.mokin.myfinances.app.detail_views.AccountDetailsFragment;
 
@@ -58,13 +58,13 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.account_list_layout, container, false);
+        View rootView = inflater.inflate(R.layout.general_list_layout, container, false);
 
         // The CursorAdapter will take data from our cursor and populate the ListView.
         mAccountAdapter = new AccountAdapter(getActivity(), null, 0);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        mListView = (ListView) rootView.findViewById(R.id.account_listView);
+        mListView = (ListView) rootView.findViewById(R.id.listView);
         mListView.setEmptyView(rootView.findViewById(R.id.emptyView));
         mListView.setAdapter(mAccountAdapter);
 
@@ -76,7 +76,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
-                    Uri uri = ContentUris.withAppendedId(MyFinancesContract.Account.CONTENT_URI, cursor.getInt(MyFinancesContract.Account.COL_ID_IDX));
+                    Uri uri = ContentUris.withAppendedId(FinContract.Account.CONTENT_URI, cursor.getInt(FinContract.Account.COL_ID_IDX));
                     showAccountDetails(uri);
                 }
                 mPosition = position;
@@ -143,19 +143,17 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
         int rows;
         ContentValues cv = getAccountContentValues(bundle);
 
-        if (bundle.getInt(MyFinancesContract.Account._ID) > 0) {
+        if (bundle.getInt(FinContract.Account._ID) > 0) {
             // update account
 
-            rows = getActivity().getContentResolver().update(MyFinancesContract.Account.CONTENT_URI, cv, "_id = " + bundle.getInt(MyFinancesContract.Account._ID), null);
+            rows = getActivity().getContentResolver().update(FinContract.Account.CONTENT_URI, cv, "_id = " + bundle.getInt(FinContract.Account._ID), null);
 
             Toast.makeText(getActivity(), "Updated rows: " + rows, Toast.LENGTH_SHORT).show();
 
         } else {
             // add  new account
-            //Log.d("MainActivity", "Here goes add new account...");
 
-
-            Uri uri = getActivity().getContentResolver().insert(MyFinancesContract.Account.CONTENT_URI, cv);
+            Uri uri = getActivity().getContentResolver().insert(FinContract.Account.CONTENT_URI, cv);
 
             int id = Integer.valueOf(uri.getLastPathSegment());
 
@@ -166,7 +164,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
 
 
     private void deleteAccount(int id) {
-        int rows = getActivity().getContentResolver().delete(MyFinancesContract.Account.CONTENT_URI, "_id = " + id, null);
+        int rows = getActivity().getContentResolver().delete(FinContract.Account.CONTENT_URI, "_id = " + id, null);
         Toast.makeText(getActivity(), "Deleted rows: " + rows, Toast.LENGTH_SHORT).show();
     }
 
@@ -176,10 +174,10 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
 /*        if (bundle.getLong(MyFinancesContract.Account._ID) > 0) {
             cv.put(MyFinancesContract.Account._ID, bundle.getLong(MyFinancesContract.Account._ID));
         }*/
-        cv.put(MyFinancesContract.Account.COLUMN_NAME, bundle.getString(MyFinancesContract.Account.COLUMN_NAME));
-        cv.put(MyFinancesContract.Account.COLUMN_COMMENT, bundle.getString(MyFinancesContract.Account.COLUMN_COMMENT));
+        cv.put(FinContract.Account.COLUMN_NAME, bundle.getString(FinContract.Account.COLUMN_NAME));
+        cv.put(FinContract.Account.COLUMN_COMMENT, bundle.getString(FinContract.Account.COLUMN_COMMENT));
         // TODO: replace this stub
-        cv.put(MyFinancesContract.Account.COLUMN_CURRENCY_CODE, bundle.getString(MyFinancesContract.Account.COLUMN_CURRENCY_CODE));
+        cv.put(FinContract.Account.COLUMN_CURRENCY_CODE, bundle.getString(FinContract.Account.COLUMN_CURRENCY_CODE));
         return cv;
     }
 
@@ -199,11 +197,11 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         // Sort order:  Ascending
-        String sortOrder = MyFinancesContract.Account.COLUMN_NAME + " ASC";
+        String sortOrder = FinContract.Account.COLUMN_NAME + " ASC";
 
         return new CursorLoader(getActivity(),
-                MyFinancesContract.Account.CONTENT_URI,
-                MyFinancesContract.Account.ACCOUNT_COLUMNS,
+                FinContract.Account.CONTENT_URI,
+                FinContract.Account.ACCOUNT_COLUMNS,
                 null,
                 null,
                 sortOrder);
@@ -218,6 +216,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
         }
     }
 
+    // ? Это зачем? или changeCursor() здесь лучше?
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAccountAdapter.swapCursor(null);

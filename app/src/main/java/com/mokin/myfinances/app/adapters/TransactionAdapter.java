@@ -1,5 +1,6 @@
 package com.mokin.myfinances.app.adapters;
 
+
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
@@ -11,17 +12,17 @@ import android.widget.TextView;
 import com.mokin.myfinances.app.R;
 import com.mokin.myfinances.app.data.FinContract;
 
+public class TransactionAdapter extends CursorAdapter {
 
-public class CategoryAdapter extends CursorAdapter {
 
-    public CategoryAdapter(Context context, Cursor c, int flags) {
+    public TransactionAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-        View rowView = LayoutInflater.from(context).inflate(R.layout.category_listview_row, parent, false);
+        View rowView = LayoutInflater.from(context).inflate(R.layout.transaction_listview_row, parent, false);
 
         ViewHolder viewHolder = new ViewHolder(rowView);
         rowView.setTag(viewHolder);
@@ -35,21 +36,29 @@ public class CategoryAdapter extends CursorAdapter {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         // Read data from cursor
-        String categoryName = cursor.getString(FinContract.Category.COL_NAME_IDX);
+        String categoryId = cursor.getString(FinContract.Transactions.COL_CATEGORY_ID_IDX);
+        String comment = cursor.getString(FinContract.Transactions.COL_COMMENT_IDX);
+        String amount = cursor.getString(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX);
 
         // Find TextView and set value on it
-        viewHolder.categoryName.setText(categoryName);
-
+        viewHolder.category.setText(categoryId);
+        viewHolder.comment.setText(comment);
+        viewHolder.amount.setText(amount);
     }
+
 
     /**
      * Cache of the children views for an category list item.
      */
     static class ViewHolder {
-        final TextView categoryName;
+        final TextView category;
+        final TextView comment;
+        final TextView amount;
 
         public ViewHolder(View view) {
-            categoryName = (TextView) view.findViewById(R.id.category_name);
+            category = (TextView) view.findViewById(R.id.transaction_category_name);
+            comment = (TextView) view.findViewById(R.id.transaction_comment);
+            amount = (TextView) view.findViewById(R.id.transaction_amount);
         }
     }
 }

@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
 /**
  * Defines tables and columns for "MyFinances" database.
  */
-public class MyFinancesContract {
+public class FinContract {
 
     // The "Content authority" is a name for the entire content provider
     public static final String CONTENT_AUTHORITY = "com.mokin.myfinances.app";
@@ -125,6 +125,30 @@ public class MyFinancesContract {
         public static final String COLUMN_ACCOUNT_SOURCE = "account_source";
         public static final String COLUMN_ACCOUNT_TARGET = "account_target";
 
+        public static final String[] TRANSACTION_COLUMNS = {
+                TABLE_NAME + "." + _ID,
+                COLUMN_TRANSACTION_DATETIME,
+                COLUMN_TRANSACTION_AMOUNT,
+                COLUMN_ACCOUNT_ID,
+                COLUMN_CATEGORY_ID,
+                COLUMN_TRANSACTION_TYPE_ID,
+                COLUMN_COMMENT,
+                COLUMN_MARKET_ID,
+                COLUMN_ACCOUNT_SOURCE,
+                COLUMN_ACCOUNT_TARGET
+        };
+
+        // Indexes related to TRANSACTION_COLUMNS. If TRANSACTION_COLUMNS changes, these must be changed
+        public static final int COL_ID_IDX = 0;
+        public static final int COL_TRANSACTION_DATETIME_IDX = 1;
+        public static final int COL_TRANSACTION_AMOUNT_IDX = 2;
+        public static final int COL_ACCOUNT_ID_IDX = 3;
+        public static final int COL_CATEGORY_ID_IDX = 4;
+        public static final int COL_TRANSACTION_TYPE_ID_IDX = 5;
+        public static final int COL_COMMENT_IDX = 6;
+        public static final int COL_MARKET_ID_IDX = 7;
+        public static final int COL_ACCOUNT_SOURCE_IDX = 8;
+        public static final int COL_ACCOUNT_TARGET_IDX = 9;
 
         // URI that identifies data in the provider
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRANSACTION).build();

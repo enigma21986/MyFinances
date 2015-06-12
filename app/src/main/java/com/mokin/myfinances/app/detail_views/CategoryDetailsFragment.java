@@ -23,7 +23,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.mokin.myfinances.app.R;
-import com.mokin.myfinances.app.data.MyFinancesContract;
+import com.mokin.myfinances.app.data.FinContract;
 import com.mokin.myfinances.app.data.TransactionType;
 import com.mokin.myfinances.app.utility.SpinnerData;
 
@@ -167,14 +167,14 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
     private void editCategory() {
         if (!TextUtils.isEmpty(mEtCategoryName.getText().toString())) {
             Bundle category = new Bundle();
-            category.putInt(MyFinancesContract.Category._ID, mCategoryId);
-            category.putString(MyFinancesContract.Category.COLUMN_NAME, mEtCategoryName.getText().toString());
+            category.putInt(FinContract.Category._ID, mCategoryId);
+            category.putString(FinContract.Category.COLUMN_NAME, mEtCategoryName.getText().toString());
 
             int val = ((SpinnerData) mParentCategorySpinner.getItemAtPosition(mParentCategorySpinner.getSelectedItemPosition())).getKey();
-            category.putInt(MyFinancesContract.Category.COLUMN_PARENT_ID, val);
+            category.putInt(FinContract.Category.COLUMN_PARENT_ID, val);
 
             val = ((TransactionType) mTransactionTypeSpinner.getItemAtPosition(mTransactionTypeSpinner.getSelectedItemPosition())).getId();
-            category.putInt(MyFinancesContract.Category.COLUMN_TRANSACTION_TYPE_ID, val);
+            category.putInt(FinContract.Category.COLUMN_TRANSACTION_TYPE_ID, val);
 
             getActivity().getIntent().putExtras(category);
 
@@ -189,9 +189,9 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             return new CursorLoader(
                     getActivity(),
-                    MyFinancesContract.Category.CONTENT_URI,
+                    FinContract.Category.CONTENT_URI,
                     //intent.getData(), // Uri
-                    MyFinancesContract.Category.CATEGORY_COLUMNS,
+                    FinContract.Category.CATEGORY_COLUMNS,
                     null,
                     null,
                     null
@@ -208,17 +208,17 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
         if (cursor != null) {
 
             while (cursor.moveToNext()) {
-                if (mCategoryId == cursor.getInt(MyFinancesContract.Category.COL_ID_IDX)) {
+                if (mCategoryId == cursor.getInt(FinContract.Category.COL_ID_IDX)) {
 
-                    mEtCategoryName.setText(cursor.getString(MyFinancesContract.Category.COL_NAME_IDX));
+                    mEtCategoryName.setText(cursor.getString(FinContract.Category.COL_NAME_IDX));
 
-                    pos = mTransactionTypeAdapter.getPosition(TransactionType.getTypeById(cursor.getInt(MyFinancesContract.Category.COL_TRANSACTION_TYPE_ID_IDX)));
+                    pos = mTransactionTypeAdapter.getPosition(TransactionType.getTypeById(cursor.getInt(FinContract.Category.COL_TRANSACTION_TYPE_ID_IDX)));
                     mTransactionTypeSpinner.setSelection(pos);
 
-                    parentId =  cursor.getInt(MyFinancesContract.Category.COL_PARENT_ID_IDX);
+                    parentId =  cursor.getInt(FinContract.Category.COL_PARENT_ID_IDX);
 
                 } else {
-                    mCategoryList.add(new SpinnerData(cursor.getInt(MyFinancesContract.Category.COL_ID_IDX), cursor.getString(MyFinancesContract.Category.COL_NAME_IDX)));
+                    mCategoryList.add(new SpinnerData(cursor.getInt(FinContract.Category.COL_ID_IDX), cursor.getString(FinContract.Category.COL_NAME_IDX)));
                 }
 
             }
