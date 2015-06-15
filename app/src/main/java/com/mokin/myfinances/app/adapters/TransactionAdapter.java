@@ -36,12 +36,12 @@ public class TransactionAdapter extends CursorAdapter {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
         // Read data from cursor
-        String categoryId = cursor.getString(FinContract.Transactions.COL_CATEGORY_ID_IDX);
+        String category = cursor.getString(FinContract.Transactions.COL_CATEGORY_NAME_IDX);
         String comment = cursor.getString(FinContract.Transactions.COL_COMMENT_IDX);
-        String amount = cursor.getString(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX);
+        String amount = String.valueOf(cursor.getDouble(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX));
 
         // Find TextView and set value on it
-        viewHolder.category.setText(categoryId);
+        viewHolder.category.setText(category);
         viewHolder.comment.setText(comment);
         viewHolder.amount.setText(amount);
     }

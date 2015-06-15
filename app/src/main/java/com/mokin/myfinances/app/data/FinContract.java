@@ -20,6 +20,7 @@ public class FinContract {
     public static final String PATH_BUDGET = "budget";
     public static final String PATH_CURRENCY = "currency";
     public static final String PATH_TRANSACTION = "transactions";
+    public static final String PATH_TRANSACTION_WITH_CATEGORY_NAME = "transactions_with_category_name";
     public static final String PATH_MARKET = "market";
 
 
@@ -30,7 +31,7 @@ public class FinContract {
         // Table fields
         public static final String COLUMN_NAME = "name";
         public static final String COLUMN_PARENT_ID = "parent_id";
-        public static final String COLUMN_TRANSACTION_TYPE_ID = "transaction_type_id";
+        public static final String COLUMN_TRANSACTION_TYPE_ID = "transaction_type";
 
         public static final String[] CATEGORY_COLUMNS = {
                 TABLE_NAME + "." + _ID,
@@ -119,6 +120,7 @@ public class FinContract {
         public static final String COLUMN_TRANSACTION_AMOUNT = "transaction_amount";
         public static final String COLUMN_ACCOUNT_ID = "account_id";
         public static final String COLUMN_CATEGORY_ID = "category_id";
+        public static final String COLUMN_CATEGORY_NAME = "name";
         public static final String COLUMN_TRANSACTION_TYPE_ID = "transaction_type_id";
         public static final String COLUMN_COMMENT = "comment";
         public static final String COLUMN_MARKET_ID = "market_id";
@@ -131,6 +133,7 @@ public class FinContract {
                 COLUMN_TRANSACTION_AMOUNT,
                 COLUMN_ACCOUNT_ID,
                 COLUMN_CATEGORY_ID,
+                COLUMN_CATEGORY_NAME,
                 COLUMN_TRANSACTION_TYPE_ID,
                 COLUMN_COMMENT,
                 COLUMN_MARKET_ID,
@@ -144,14 +147,16 @@ public class FinContract {
         public static final int COL_TRANSACTION_AMOUNT_IDX = 2;
         public static final int COL_ACCOUNT_ID_IDX = 3;
         public static final int COL_CATEGORY_ID_IDX = 4;
-        public static final int COL_TRANSACTION_TYPE_ID_IDX = 5;
-        public static final int COL_COMMENT_IDX = 6;
-        public static final int COL_MARKET_ID_IDX = 7;
-        public static final int COL_ACCOUNT_SOURCE_IDX = 8;
-        public static final int COL_ACCOUNT_TARGET_IDX = 9;
+        public static final int COL_CATEGORY_NAME_IDX = 5;
+        public static final int COL_TRANSACTION_TYPE_ID_IDX = 6;
+        public static final int COL_COMMENT_IDX = 7;
+        public static final int COL_MARKET_ID_IDX = 8;
+        public static final int COL_ACCOUNT_SOURCE_IDX = 9;
+        public static final int COL_ACCOUNT_TARGET_IDX = 10;
 
         // URI that identifies data in the provider
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRANSACTION).build();
+        public static final Uri CONTENT_URI_WITH_CATEGORY_NAME = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRANSACTION_WITH_CATEGORY_NAME).build();
 
         // MIME types
         public static final String MIME_TYPE =

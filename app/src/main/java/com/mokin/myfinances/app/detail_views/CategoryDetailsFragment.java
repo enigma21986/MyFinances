@@ -41,7 +41,6 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
     private ArrayAdapter<SpinnerData> mCategoryAdapter;
     private ArrayAdapter<TransactionType> mTransactionTypeAdapter;
 
-    private static final int CATEGORY_DETAIL_LOADER = 0;
     public static final int RESULT_SAVE = 100;
     public static final int RESULT_DELETE = 101;
 
@@ -67,7 +66,7 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
 
         if (savedInstanceState == null){
             mCategoryList = new ArrayList<>();
-            mCategoryList.add(new SpinnerData(0, "Root category"));
+            mCategoryList.add(new SpinnerData(0, "Choose category"));
         } else {
             mCategoryList = (ArrayList<SpinnerData>) savedInstanceState.getSerializable("mCategoryList");
         }
@@ -107,7 +106,7 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(CATEGORY_DETAIL_LOADER, null, this);
+        getLoaderManager().initLoader(0, null, this);
     }
 
 
@@ -236,18 +235,16 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
         }
     }
 
+
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
     }
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("mCategoryList", mCategoryList);
     }
-
-
-
 
 }

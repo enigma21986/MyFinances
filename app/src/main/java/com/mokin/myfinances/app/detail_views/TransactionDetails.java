@@ -4,9 +4,10 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
 import com.mokin.myfinances.app.R;
+import com.mokin.myfinances.app.utility.DatePickerFragment;
 
 
-public class TransactionDetails extends ActionBarActivity {
+public class TransactionDetails extends ActionBarActivity implements DatePickerFragment.MyDateSetCallbacks {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,5 +22,12 @@ public class TransactionDetails extends ActionBarActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+    }
+
+
+    @Override
+    public void onDateSet(int year, int month, int day) {
+        TransactionDetailsFragment fragment = (TransactionDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.detail_container);
+        fragment.setTransactionDate(year, month, day);
     }
 }

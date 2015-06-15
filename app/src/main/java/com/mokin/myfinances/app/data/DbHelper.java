@@ -11,8 +11,6 @@ import com.mokin.myfinances.app.data.FinContract.Category;
 import com.mokin.myfinances.app.data.FinContract.Market;
 import com.mokin.myfinances.app.data.FinContract.Transactions;
 
-import java.util.Calendar;
-
 /**
  * Manages a local database for MyFinances data.
  */
@@ -21,7 +19,7 @@ public class DbHelper extends SQLiteOpenHelper {
     // DB constants.
     public static final String DB_NAME = "myfinances.db";
     // If you change the database schema, you must increment the database version.
-    public static final int DB_VERSION = 13;
+    public static final int DB_VERSION = 1;
 
 
     public DbHelper(Context context) {
@@ -79,17 +77,6 @@ public class DbHelper extends SQLiteOpenHelper {
 
         ContentValues cv = new ContentValues();
 
-/*
-        cv.put(TransactionType.COLUMN_NAME, "Расход");
-        sqLiteDatabase.insert(TransactionType.TABLE_NAME, null, cv);
-
-        for (int i = 1; i <= 3; i++) {
-            cv.put(Category.COLUMN_NAME, "яйцо " + i);
-            cv.put(Category.COLUMN_TRANSACTION_TYPE_ID, 1);
-            sqLiteDatabase.insert(Category.TABLE_NAME, null, cv);
-        }*/
-
-
         for (int i = 1; i <= 3; i++) {
             cv.put(Account.COLUMN_NAME, "Счет " + i);
             cv.put(Account.COLUMN_CURRENCY_CODE, "RUB");
@@ -108,15 +95,19 @@ public class DbHelper extends SQLiteOpenHelper {
 
         cv.clear();
 
-        Calendar c = Calendar.getInstance();
-        int utcOffset = c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET);
-        Long utcMilliseconds = c.getTimeInMillis() + utcOffset;
+        //Calendar c = Calendar.getInstance();
+        //int utcOffset = c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET);
+        //Long utcMilliseconds = c.getTimeInMillis() + utcOffset;
+
+        long epoch = System.currentTimeMillis();
 
         for (int i = 1; i <= 2; i++) {
-            cv.put(Transactions.COLUMN_TRANSACTION_DATETIME, utcMilliseconds);
+            cv.put(Transactions.COLUMN_TRANSACTION_DATETIME, epoch);
             cv.put(Transactions.COLUMN_TRANSACTION_AMOUNT, 100*i);
             cv.put(Transactions.COLUMN_ACCOUNT_ID, i);
             cv.put(Transactions.COLUMN_TRANSACTION_TYPE_ID, i);
+            cv.put(Transactions.COLUMN_CATEGORY_ID, i);
+            cv.put(Transactions.COLUMN_COMMENT, "Комментарий " + i);
 
             sqLiteDatabase.insert(Transactions.TABLE_NAME, null, cv);
         }

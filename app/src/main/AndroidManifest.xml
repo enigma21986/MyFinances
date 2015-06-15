@@ -27,6 +27,7 @@
 
         <activity android:name=".detail_views.AccountDetails" />
         <activity android:name=".detail_views.CategoryDetails" />
+        <activity android:name=".detail_views.TransactionDetails" />
 
 
         <provider

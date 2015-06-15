@@ -157,6 +157,8 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
 
     public void setCurrencyCode(String code) {
         mCurrencyCode = code;
+        Currency currency = Currency.getInstance(code);
+        mBtnAccountCurrency.setText(currency.getSymbol() + "(" + currency.getDisplayName() + ")");
     }
 
 
@@ -166,7 +168,6 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
         Intent intent = getActivity().getIntent();
 
         if (intent.getData() != null) {
-
             // Now create and return a CursorLoader that will take care of
             // creating a Cursor for the data being displayed.
             return new CursorLoader(
@@ -191,17 +192,13 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
             mEtAccountName.setText(cursor.getString(FinContract.Account.COL_NAME_IDX));
             mEtAccountComment.setText(cursor.getString(FinContract.Account.COL_COMMENT_IDX));
 
-            mCurrencyCode = cursor.getString(FinContract.Account.COL_CURRENCY_CODE_IDX);
-
-            Currency currency = Currency.getInstance(mCurrencyCode);
-            mBtnAccountCurrency.setText(currency.getSymbol() + "(" + currency.getDisplayName() + ")");
+            setCurrencyCode(cursor.getString(FinContract.Account.COL_CURRENCY_CODE_IDX));
         }
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
     }
 
 }

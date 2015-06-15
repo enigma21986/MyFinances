@@ -40,7 +40,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
 
 
     public TransactionListFragment() {
-        //setHasOptionsMenu(true);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
 
                     Bundle bundle = new Bundle();
                     bundle.putInt(FinContract.Transactions._ID, cursor.getInt(FinContract.Transactions.COL_ID_IDX));
-                    bundle.putString(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME, cursor.getString(FinContract.Transactions.COL_TRANSACTION_DATETIME_IDX));
+                    bundle.putLong(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME, cursor.getLong(FinContract.Transactions.COL_TRANSACTION_DATETIME_IDX));
                     bundle.putDouble(FinContract.Transactions.COLUMN_TRANSACTION_AMOUNT, cursor.getDouble(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX));
                     bundle.putInt(FinContract.Transactions.COLUMN_ACCOUNT_ID, cursor.getInt(FinContract.Transactions.COL_ACCOUNT_ID_IDX));
                     bundle.putInt(FinContract.Transactions.COLUMN_TRANSACTION_TYPE_ID, cursor.getInt(FinContract.Transactions.COL_TRANSACTION_TYPE_ID_IDX));
@@ -119,7 +119,9 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     private void showTransactionDetails(Bundle bundle) {
         Intent intentDetails = new Intent(getActivity(), TransactionDetails.class);
         //intentDetails.setData(uri);
-        intentDetails.putExtras(bundle);
+        if (bundle != null) {
+            intentDetails.putExtras(bundle);
+        }
         startActivityForResult(intentDetails, DETAILS_REQUEST);
     }
 
@@ -164,7 +166,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
         String sortOrder = FinContract.Transactions.COLUMN_TRANSACTION_DATETIME + " ASC";
 
         return new CursorLoader(getActivity(),
-                FinContract.Transactions.CONTENT_URI,
+                FinContract.Transactions.CONTENT_URI_WITH_CATEGORY_NAME,
                 FinContract.Transactions.TRANSACTION_COLUMNS,
                 null,
                 null,

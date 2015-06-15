@@ -216,7 +216,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
         }
     }
 
-    // ? Это зачем? или changeCursor() здесь лучше?
+    // maybe changeCursor() will be better?
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAccountAdapter.swapCursor(null);

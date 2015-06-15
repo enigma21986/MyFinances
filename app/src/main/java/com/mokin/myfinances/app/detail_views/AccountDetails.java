@@ -3,12 +3,9 @@ package com.mokin.myfinances.app.detail_views;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
-import android.widget.Button;
 
 import com.mokin.myfinances.app.CurrencyListDialogFragment;
 import com.mokin.myfinances.app.R;
-
-import java.util.Currency;
 
 public class AccountDetails extends ActionBarActivity implements CurrencyListDialogFragment.MyCurrencySelectedCallbacks {
 
@@ -38,13 +35,13 @@ public class AccountDetails extends ActionBarActivity implements CurrencyListDia
     @Override
     public void onCurrencySelected(String code) {
 
-        AccountDetailsFragment fragment = (AccountDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.account_detail_container);
+        AccountDetailsFragment fragment = (AccountDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.detail_container);
 
         fragment.setCurrencyCode(code);
-        Button btnSelectCurrency = (Button) fragment.getView().findViewById(R.id.btn_select_currency);
 
-        Currency currency = Currency.getInstance(code);
-        btnSelectCurrency.setText(currency.getSymbol() + "(" + currency.getDisplayName() + ")");
+        //Button btnSelectCurrency = (Button) fragment.getView().findViewById(R.id.btn_select_currency);
+        //Currency currency = Currency.getInstance(code);
+        //btnSelectCurrency.setText(currency.getSymbol() + "(" + currency.getDisplayName() + ")");
     }
 
 }

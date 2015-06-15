@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
 public class MyCustomProvider extends ContentProvider {
@@ -19,12 +20,13 @@ public class MyCustomProvider extends ContentProvider {
     private static final int CATEGORY_SEARCH = 102;
     private static final int MARKET = 200;
     private static final int MARKET_ID = 201;
-    private static final int ACCOUNT = 400;
-    private static final int ACCOUNT_ID = 401;
-    private static final int BUDGET = 500;
-    private static final int BUDGET_ID = 501;
-    private static final int TRANSACTION = 600;
-    private static final int TRANSACTION_ID = 601;
+    private static final int ACCOUNT = 300;
+    private static final int ACCOUNT_ID = 301;
+    private static final int BUDGET = 400;
+    private static final int BUDGET_ID = 401;
+    private static final int TRANSACTION = 500;
+    private static final int TRANSACTION_WITH_CATEGORY_NAME = 501;
+    private static final int TRANSACTION_ID = 502;
 
 
 
@@ -50,6 +52,7 @@ public class MyCustomProvider extends ContentProvider {
         matcher.addURI(authority, FinContract.PATH_BUDGET + "/#", BUDGET_ID);
 
         matcher.addURI(authority, FinContract.PATH_TRANSACTION, TRANSACTION);
+        matcher.addURI(authority, FinContract.PATH_TRANSACTION_WITH_CATEGORY_NAME, TRANSACTION_WITH_CATEGORY_NAME);
         matcher.addURI(authority, FinContract.PATH_TRANSACTION + "/#", TRANSACTION_ID);
 
         return matcher;
@@ -260,6 +263,22 @@ public class MyCustomProvider extends ContentProvider {
             case TRANSACTION:
                 returnCursor = mOpenHelper.getReadableDatabase().query(
                         FinContract.Transactions.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            // "transactions_with_category_name"
+            case TRANSACTION_WITH_CATEGORY_NAME:
+                SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+                qb.setTables(FinContract.Transactions.TABLE_NAME + " LEFT JOIN " +
+                             FinContract.Category.TABLE_NAME + " ON " + FinContract.Transactions.TABLE_NAME + "." +
+                             FinContract.Transactions.COLUMN_CATEGORY_ID + " = " + FinContract.Category.TABLE_NAME + "." + FinContract.Category._ID);
+
+                returnCursor = qb.query(mOpenHelper.getReadableDatabase(),
                         projection,
                         selection,
                         selectionArgs,

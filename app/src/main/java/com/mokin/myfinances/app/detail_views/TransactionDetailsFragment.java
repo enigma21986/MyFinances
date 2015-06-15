@@ -4,30 +4,58 @@ package com.mokin.myfinances.app.detail_views;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.mokin.myfinances.app.R;
 import com.mokin.myfinances.app.data.FinContract;
+import com.mokin.myfinances.app.data.TransactionType;
+import com.mokin.myfinances.app.utility.DatePickerFragment;
+import com.mokin.myfinances.app.utility.SpinnerData;
 
-public class TransactionDetailsFragment extends Fragment {
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+
+public class TransactionDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
 
     private int mTransactionId;
+    private int mAccountId;
+    private int mCategoryId;
+    private long mTransactionDateTime;
+    private ArrayList<SpinnerData> mAccountList;
+    private ArrayAdapter<SpinnerData> mAccountAdapter;
+    private ArrayList<SpinnerData> mCategoryList;
+    private ArrayAdapter<SpinnerData> mCategoryAdapter;
+    private ArrayAdapter<TransactionType> mTransactionTypeAdapter;
 
-    private EditText mTransactionDate;
     private EditText mTransactionAmount;
     private EditText mTransactionComment;
     private Spinner mTransactionAccountSpinner;
     private Spinner mTransactionTypeSpinner;
     private Spinner mTransactionCategorySpinner;
+    private Button mBtnTransactionDate;
+    private Button mBtnTransactionTime;
+
+    public static final int ACCOUNT_LOADER = 0;
+    public static final int CATEGORY_LOADER = 1;
+
+    public static final String DATE_FORMAT = "dd.MM.yyyy";
+    public static final String TIME_FORMAT = "HH:mm";
 
     public static final int RESULT_DELETE = 101;
 
@@ -41,7 +69,8 @@ public class TransactionDetailsFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //getLoaderManager().initLoader(CATEGORY_DETAIL_LOADER, null, this);
+        getLoaderManager().initLoader(ACCOUNT_LOADER, null, this);
+        getLoaderManager().initLoader(CATEGORY_LOADER, null, this);
     }
 
 
@@ -50,29 +79,70 @@ public class TransactionDetailsFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.transaction_detail_layout, container, false);
 
-        mTransactionDate = (EditText) rootView.findViewById(R.id.transaction_date);
         mTransactionAmount = (EditText) rootView.findViewById(R.id.transaction_amount);
         mTransactionAccountSpinner = (Spinner) rootView.findViewById(R.id.transaction_account_spinner);
         mTransactionTypeSpinner = (Spinner) rootView.findViewById(R.id.transaction_type_spinner);
         mTransactionCategorySpinner = (Spinner) rootView.findViewById(R.id.transaction_category_spinner);
         mTransactionComment = (EditText) rootView.findViewById(R.id.transaction_comment);
+        mBtnTransactionDate = (Button) rootView.findViewById(R.id.btn_transaction_date);
+        mBtnTransactionTime = (Button) rootView.findViewById(R.id.btn_transaction_time);
 
-//        Intent intent = getActivity().getIntent();
-//        if (intent.getData() != null){
-//            mTransactionId = (int) ContentUris.parseId(intent.getData());
-//        }
+        TransactionType[] data = {TransactionType.Expense, TransactionType.Income, TransactionType.Transfer};
+        mTransactionTypeAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, data);
+        mTransactionTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mTransactionTypeSpinner.setAdapter(mTransactionTypeAdapter);
+
+        // TODO: do localisation
+        mTransactionTypeSpinner.setPrompt("Select transaction type");
 
         Bundle bundle = getActivity().getIntent().getExtras();
 
         if (bundle != null) {
             mTransactionId = bundle.getInt(FinContract.Transactions._ID);
+            mAccountId = bundle.getInt(FinContract.Transactions.COLUMN_ACCOUNT_ID);
+            mCategoryId = bundle.getInt(FinContract.Transactions.COLUMN_CATEGORY_ID);
+            mTransactionDateTime = bundle.getLong(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME);
 
-            mTransactionDate.setText(bundle.getString(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME));
             mTransactionAmount.setText(String.valueOf(bundle.getDouble(FinContract.Transactions.COLUMN_TRANSACTION_AMOUNT)));
-
             mTransactionComment.setText(bundle.getString(FinContract.Transactions.COLUMN_COMMENT));
 
+            int pos = mTransactionTypeAdapter.getPosition(TransactionType.getTypeById(bundle.getInt(FinContract.Transactions.COLUMN_TRANSACTION_TYPE_ID)));
+            mTransactionTypeSpinner.setSelection(pos);
+
+        } else {
+            mTransactionDateTime = System.currentTimeMillis();
         }
+
+        Date date = new Date(mTransactionDateTime);
+        String dateStr = new SimpleDateFormat(DATE_FORMAT).format(date);
+        String timeStr = new SimpleDateFormat(TIME_FORMAT).format(date);
+
+        mBtnTransactionDate.setText(dateStr);
+        mBtnTransactionTime.setText(timeStr);
+        mBtnTransactionDate.setOnClickListener(this);
+        mBtnTransactionTime.setOnClickListener(this);
+
+        if (savedInstanceState == null){
+            mCategoryList = new ArrayList<>();
+            mCategoryList.add(new SpinnerData(0, "Choose category"));
+            mAccountList = new ArrayList<>();
+            mAccountList.add(new SpinnerData(0, "Choose account"));
+        } else {
+            mCategoryList = (ArrayList<SpinnerData>) savedInstanceState.getSerializable("mCategoryList");
+            mAccountList = (ArrayList<SpinnerData>) savedInstanceState.getSerializable("mAccountList");
+        }
+
+        mCategoryAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, mCategoryList);
+        mCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mTransactionCategorySpinner.setAdapter(mCategoryAdapter);
+
+        mAccountAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, mAccountList);
+        mAccountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mTransactionAccountSpinner.setAdapter(mAccountAdapter);
+
+        // TODO: do localisation
+        mTransactionCategorySpinner.setPrompt("Select category");
+        mTransactionAccountSpinner.setPrompt("Select account");
 
         return rootView;
     }
@@ -137,4 +207,114 @@ public class TransactionDetailsFragment extends Fragment {
     }
 
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        CursorLoader loader = null;
+
+        switch (id) {
+            case ACCOUNT_LOADER:
+                loader = new CursorLoader(
+                        getActivity(),
+                        FinContract.Account.CONTENT_URI,
+                        FinContract.Account.ACCOUNT_COLUMNS,
+                        null,
+                        null,
+                        null
+                );
+                break;
+            case CATEGORY_LOADER:
+                loader = new CursorLoader(
+                        getActivity(),
+                        FinContract.Category.CONTENT_URI,
+                        FinContract.Category.CATEGORY_COLUMNS,
+                        null,
+                        null,
+                        null
+                );
+                break;
+        }
+
+        return loader;
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+
+        switch (loader.getId()) {
+            case ACCOUNT_LOADER:
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        mAccountList.add(new SpinnerData(cursor.getInt(FinContract.Account.COL_ID_IDX),
+                                cursor.getString(FinContract.Account.COL_NAME_IDX)));
+                    }
+                }
+                mAccountAdapter.notifyDataSetChanged();
+                break;
+            case CATEGORY_LOADER:
+                if (cursor != null) {
+                    while (cursor.moveToNext()) {
+                        mCategoryList.add(new SpinnerData(cursor.getInt(FinContract.Category.COL_ID_IDX),
+                                cursor.getString(FinContract.Category.COL_NAME_IDX)));
+                    }
+                }
+                mCategoryAdapter.notifyDataSetChanged();
+                break;
+        }
+
+        for (SpinnerData account : mAccountList) {
+            if (mAccountId == account.getKey()){
+                int pos = mAccountAdapter.getPosition(account);
+                mTransactionAccountSpinner.setSelection(pos);
+                break;
+            }
+        }
+
+        for (SpinnerData category : mCategoryList) {
+            if (mCategoryId == category.getKey()){
+                int pos = mCategoryAdapter.getPosition(category);
+                mTransactionCategorySpinner.setSelection(pos);
+                break;
+            }
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("mCategoryList", mCategoryList);
+        outState.putSerializable("mAccountList", mAccountList);
+    }
+
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.btn_transaction_date:
+
+                Bundle bundle = new Bundle();
+                bundle.putLong("transactionDateTime", mTransactionDateTime); // ???
+
+                DatePickerFragment dialog = new DatePickerFragment();
+                dialog.setArguments(bundle);
+                dialog.show(getActivity().getSupportFragmentManager(), this.getClass().getSimpleName());
+
+                break;
+            case R.id.btn_transaction_time:
+
+        }
+
+    }
+
+    public void setTransactionDate(int year, int month, int day) {
+
+    }
 }
