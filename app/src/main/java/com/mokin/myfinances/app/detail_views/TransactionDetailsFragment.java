@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -26,9 +27,11 @@ import com.mokin.myfinances.app.data.FinContract;
 import com.mokin.myfinances.app.data.TransactionType;
 import com.mokin.myfinances.app.utility.DatePickerFragment;
 import com.mokin.myfinances.app.utility.SpinnerData;
+import com.mokin.myfinances.app.utility.TimePickerFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class TransactionDetailsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, View.OnClickListener {
@@ -113,12 +116,8 @@ public class TransactionDetailsFragment extends Fragment implements LoaderManage
             mTransactionDateTime = System.currentTimeMillis();
         }
 
-        Date date = new Date(mTransactionDateTime);
-        String dateStr = new SimpleDateFormat(DATE_FORMAT).format(date);
-        String timeStr = new SimpleDateFormat(TIME_FORMAT).format(date);
+        setTransactionDateAndTimeText(mTransactionDateTime);
 
-        mBtnTransactionDate.setText(dateStr);
-        mBtnTransactionTime.setText(timeStr);
         mBtnTransactionDate.setOnClickListener(this);
         mBtnTransactionTime.setOnClickListener(this);
 
@@ -148,7 +147,7 @@ public class TransactionDetailsFragment extends Fragment implements LoaderManage
     }
 
 
-        @Override
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // TODO: change it!
         inflater.inflate(R.menu.menu_account_details, menu);
@@ -297,24 +296,53 @@ public class TransactionDetailsFragment extends Fragment implements LoaderManage
     @Override
     public void onClick(View v) {
 
+        Bundle bundle = new Bundle();
+        bundle.putLong("transactionDateTime", mTransactionDateTime); // ???
+
+        DialogFragment dialog;
+
         switch (v.getId()) {
             case R.id.btn_transaction_date:
-
-                Bundle bundle = new Bundle();
-                bundle.putLong("transactionDateTime", mTransactionDateTime); // ???
-
-                DatePickerFragment dialog = new DatePickerFragment();
+                dialog = new DatePickerFragment();
                 dialog.setArguments(bundle);
                 dialog.show(getActivity().getSupportFragmentManager(), this.getClass().getSimpleName());
 
                 break;
             case R.id.btn_transaction_time:
+                dialog = new TimePickerFragment();
+                dialog.setArguments(bundle);
+                dialog.show(getActivity().getSupportFragmentManager(), this.getClass().getSimpleName());
 
         }
 
     }
 
-    public void setTransactionDate(int year, int month, int day) {
 
+    private void setTransactionDateAndTimeText(long milliSeconds) {
+        Date date = new Date(milliSeconds);
+        String dateStr = new SimpleDateFormat(DATE_FORMAT).format(date);
+        String timeStr = new SimpleDateFormat(TIME_FORMAT).format(date);
+
+        mBtnTransactionDate.setText(dateStr);
+        mBtnTransactionTime.setText(timeStr);
+    }
+
+
+    public void setTransactionDate(int year, int month, int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(mTransactionDateTime);
+        calendar.set(year, month, day);
+        mTransactionDateTime = calendar.getTimeInMillis();
+        setTransactionDateAndTimeText(mTransactionDateTime);
+    }
+
+
+    public void setTransactionTime(int hourOfDay, int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(mTransactionDateTime);
+        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        calendar.set(Calendar.MINUTE, minute);
+        mTransactionDateTime = calendar.getTimeInMillis();
+        setTransactionDateAndTimeText(mTransactionDateTime);
     }
 }
