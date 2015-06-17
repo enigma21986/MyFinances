@@ -112,7 +112,7 @@ public class AccountDetailsFragment extends Fragment implements LoaderManager.Lo
                 builder.setPositiveButton(R.string.delete,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                getActivity().setResult(RESULT_DELETE, getActivity().getIntent().putExtra("id", mAccountId));
+                                getActivity().setResult(RESULT_DELETE, getActivity().getIntent().putExtra(FinContract.Account._ID, mAccountId));
                                 getActivity().finish();
                             }
                         });

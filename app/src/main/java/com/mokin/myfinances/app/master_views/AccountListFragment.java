@@ -128,7 +128,7 @@ public class AccountListFragment extends Fragment implements LoaderManager.Loade
                     break;
 
                 case AccountDetailsFragment.RESULT_DELETE:
-                    int id = data.getIntExtra("id", -1);
+                    int id = data.getIntExtra(FinContract.Account._ID, -1);
                     deleteAccount(id);
                     break;
 

@@ -2,6 +2,7 @@ package com.mokin.myfinances.app.master_views;
 
 import android.app.Activity;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -138,11 +139,13 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
                 case CategoryDetailsFragment.RESULT_SAVE:
                     Bundle bundle = data.getExtras();
                     saveTransaction(bundle);
+                    getLoaderManager().initLoader(TRANSACTIONS_LOADER, null, this); // ???
                     break;
 
                 case CategoryDetailsFragment.RESULT_DELETE:
-                    int id = data.getIntExtra("id", -1);
+                    int id = data.getIntExtra(FinContract.Transactions._ID, -1);
                     deleteTransaction(id);
+                    getLoaderManager().initLoader(TRANSACTIONS_LOADER, null, this); // ???
                     break;
 
                 default:
@@ -152,11 +155,65 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     }
 
     private void saveTransaction(Bundle bundle) {
+        int rows;
+        ContentValues cv;
+
+        if (bundle.getInt(FinContract.Transactions._ID) > 0) {
+            // update transaction
+            cv = getContentValues(bundle);
+            rows = getActivity().getContentResolver().update(FinContract.Transactions.CONTENT_URI, cv, "_id = " + bundle.getInt(FinContract.Transactions._ID), null);
+
+            Toast.makeText(getActivity(), "Updated rows: " + rows, Toast.LENGTH_SHORT).show();
+
+        } else {
+            // add  new transaction
+            cv = getContentValues(bundle);
+            Uri uri = getActivity().getContentResolver().insert(FinContract.Transactions.CONTENT_URI, cv);
+
+            int id = Integer.valueOf(uri.getLastPathSegment());
+
+            Toast.makeText(getActivity(), "New transaction added with ID = " + id, Toast.LENGTH_SHORT).show();
+        }
+
+        // Required to invoke explicitly
+        //mTransactionAdapter.notifyDataSetChanged();
 
     }
 
     private void deleteTransaction(int id) {
+        int rows = getActivity().getContentResolver().delete(FinContract.Transactions.CONTENT_URI, "_id = " + id, null);
+        Toast.makeText(getActivity(), "Deleted rows: " + rows, Toast.LENGTH_SHORT).show();
+        // Required to invoke explicitly
+        //mTransactionAdapter.notifyDataSetChanged();
+    }
 
+
+    private ContentValues getContentValues(Bundle bundle) {
+        ContentValues cv = new ContentValues();
+
+        cv.put(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME, bundle.getLong(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME));
+        cv.put(FinContract.Transactions.COLUMN_TRANSACTION_AMOUNT, bundle.getDouble(FinContract.Transactions.COLUMN_TRANSACTION_AMOUNT));
+        cv.put(FinContract.Transactions.COLUMN_ACCOUNT_ID, bundle.getInt(FinContract.Transactions.COLUMN_ACCOUNT_ID));
+        cv.put(FinContract.Transactions.COLUMN_TRANSACTION_TYPE_ID, bundle.getInt(FinContract.Transactions.COLUMN_TRANSACTION_TYPE_ID));
+        cv.put(FinContract.Transactions.COLUMN_COMMENT, bundle.getString(FinContract.Transactions.COLUMN_COMMENT));
+
+        if (bundle.getInt(FinContract.Transactions.COLUMN_CATEGORY_ID) != 0) {
+            cv.put(FinContract.Transactions.COLUMN_CATEGORY_ID, bundle.getInt(FinContract.Transactions.COLUMN_CATEGORY_ID));
+        }
+
+        return cv;
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // When tablets rotate, the currently selected list item needs to be saved.
+        // When no item is selected, mPosition will be set to Listview.INVALID_POSITION,
+        // so check for that before storing.
+        if (mPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(outState);
     }
 
 

@@ -139,7 +139,7 @@ public class CategoryDetailsFragment extends Fragment implements LoaderManager.L
                 builder.setPositiveButton(R.string.delete,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                getActivity().setResult(RESULT_DELETE, getActivity().getIntent().putExtra("id", mCategoryId));
+                                getActivity().setResult(RESULT_DELETE, getActivity().getIntent().putExtra(FinContract.Category._ID, mCategoryId));
                                 getActivity().finish();
                             }
                         });

@@ -11,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.mokin.myfinances.app.R;
 import com.mokin.myfinances.app.data.FinContract;
@@ -60,6 +62,7 @@ public class TransactionDetailsFragment extends Fragment implements LoaderManage
     public static final String DATE_FORMAT = "dd.MM.yyyy";
     public static final String TIME_FORMAT = "HH:mm";
 
+    public static final int RESULT_SAVE = 100;
     public static final int RESULT_DELETE = 101;
 
 
@@ -176,7 +179,7 @@ public class TransactionDetailsFragment extends Fragment implements LoaderManage
                 builder.setPositiveButton(R.string.delete,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                getActivity().setResult(RESULT_DELETE, getActivity().getIntent().putExtra("id", mTransactionId));
+                                getActivity().setResult(RESULT_DELETE, getActivity().getIntent().putExtra(FinContract.Transactions._ID, mTransactionId));
                                 getActivity().finish();
                             }
                         });
@@ -202,7 +205,50 @@ public class TransactionDetailsFragment extends Fragment implements LoaderManage
 
     private void editTransaction() {
 
-        getActivity().finish();
+        if (isValuesValid()) {
+            Bundle transaction = new Bundle();
+            transaction.putInt(FinContract.Transactions._ID, mTransactionId);
+            transaction.putLong(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME, mTransactionDateTime);
+            transaction.putDouble(FinContract.Transactions.COLUMN_TRANSACTION_AMOUNT, Double.parseDouble(mTransactionAmount.getText().toString()));
+
+            int val = ((SpinnerData) mTransactionAccountSpinner.getItemAtPosition(mTransactionAccountSpinner.getSelectedItemPosition())).getKey();
+            transaction.putInt(FinContract.Transactions.COLUMN_ACCOUNT_ID, val);
+
+            val = ((SpinnerData) mTransactionCategorySpinner.getItemAtPosition(mTransactionCategorySpinner.getSelectedItemPosition())).getKey();
+            transaction.putInt(FinContract.Transactions.COLUMN_CATEGORY_ID, val);
+
+            val = ((TransactionType) mTransactionTypeSpinner.getItemAtPosition(mTransactionTypeSpinner.getSelectedItemPosition())).getId();
+            transaction.putInt(FinContract.Transactions.COLUMN_TRANSACTION_TYPE_ID, val);
+
+            transaction.putString(FinContract.Transactions.COLUMN_COMMENT, mTransactionComment.getText().toString());
+
+            getActivity().getIntent().putExtras(transaction);
+            getActivity().setResult(RESULT_SAVE, getActivity().getIntent());
+
+            getActivity().finish();
+
+        }
+//        else {
+//            getActivity().setResult(Activity.RESULT_CANCELED);
+//        }
+
+    }
+
+
+    private boolean isValuesValid() {
+        boolean result = true;
+
+        if (TextUtils.isEmpty(mTransactionAmount.getText().toString())) {
+            mTransactionAmount.setError("Amount is required!" );
+            result = false;
+        }
+
+        if (mTransactionAccountSpinner.getSelectedItemPosition() == 0) {
+            Toast.makeText(getActivity(), "Account is required!", Toast.LENGTH_SHORT).show();
+            result = false;
+        }
+
+        return result;
     }
 
 

@@ -132,7 +132,7 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
                     break;
 
                 case CategoryDetailsFragment.RESULT_DELETE:
-                    int id = data.getIntExtra("id", -1);
+                    int id = data.getIntExtra(FinContract.Category._ID, -1);
                     deleteCategory(id);
                     break;
 
@@ -150,7 +150,7 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
         if (bundle.getInt(FinContract.Category._ID) > 0) {
             // update category
 
-            cv = getCategoryContentValues(bundle);
+            cv = getContentValues(bundle);
             rows = getActivity().getContentResolver().update(FinContract.Category.CONTENT_URI, cv, "_id = " + bundle.getInt(FinContract.Category._ID), null);
 
             Toast.makeText(getActivity(), "Updated rows: " + rows, Toast.LENGTH_SHORT).show();
@@ -158,7 +158,7 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
         } else {
             // add  new category
 
-            cv = getCategoryContentValues(bundle);
+            cv = getContentValues(bundle);
             Uri uri = getActivity().getContentResolver().insert(FinContract.Category.CONTENT_URI, cv);
 
             int id = Integer.valueOf(uri.getLastPathSegment());
@@ -175,7 +175,7 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
     }
 
 
-    private ContentValues getCategoryContentValues(Bundle bundle) {
+    private ContentValues getContentValues(Bundle bundle) {
         ContentValues cv = new ContentValues();
 
         cv.put(FinContract.Category.COLUMN_NAME, bundle.getString(FinContract.Category.COLUMN_NAME));
