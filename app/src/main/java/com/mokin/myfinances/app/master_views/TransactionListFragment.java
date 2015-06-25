@@ -139,13 +139,11 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
                 case CategoryDetailsFragment.RESULT_SAVE:
                     Bundle bundle = data.getExtras();
                     saveTransaction(bundle);
-                    getLoaderManager().initLoader(TRANSACTIONS_LOADER, null, this); // ???
                     break;
 
                 case CategoryDetailsFragment.RESULT_DELETE:
                     int id = data.getIntExtra(FinContract.Transactions._ID, -1);
                     deleteTransaction(id);
-                    getLoaderManager().initLoader(TRANSACTIONS_LOADER, null, this); // ???
                     break;
 
                 default:
@@ -155,7 +153,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     }
 
     private void saveTransaction(Bundle bundle) {
-        int rows;
+        int rows, id;
         ContentValues cv;
 
         if (bundle.getInt(FinContract.Transactions._ID) > 0) {
@@ -170,21 +168,19 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
             cv = getContentValues(bundle);
             Uri uri = getActivity().getContentResolver().insert(FinContract.Transactions.CONTENT_URI, cv);
 
-            int id = Integer.valueOf(uri.getLastPathSegment());
+            id = Integer.valueOf(uri.getLastPathSegment());
 
             Toast.makeText(getActivity(), "New transaction added with ID = " + id, Toast.LENGTH_SHORT).show();
         }
 
-        // Required to invoke explicitly
-        //mTransactionAdapter.notifyDataSetChanged();
-
+        getLoaderManager().restartLoader(TRANSACTIONS_LOADER, null, this);
     }
 
     private void deleteTransaction(int id) {
         int rows = getActivity().getContentResolver().delete(FinContract.Transactions.CONTENT_URI, "_id = " + id, null);
         Toast.makeText(getActivity(), "Deleted rows: " + rows, Toast.LENGTH_SHORT).show();
-        // Required to invoke explicitly
-        //mTransactionAdapter.notifyDataSetChanged();
+
+        getLoaderManager().restartLoader(TRANSACTIONS_LOADER, null, this);
     }
 
 
