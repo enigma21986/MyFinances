@@ -50,4 +50,8 @@
     <!-- Transaction details view -->
     <string name="transaction_confirm_delete">Are you sure to delete the transaction?</string>
 
+    <!-- Transactions list view -->
+    <string name="income_label">Доход</string>
+    <string name="expense_label">Расход</string>
+
 </resources>

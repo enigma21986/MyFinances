@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,13 +20,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mokin.myfinances.app.R;
 import com.mokin.myfinances.app.adapters.TransactionAdapter;
 import com.mokin.myfinances.app.data.FinContract;
+import com.mokin.myfinances.app.data.TransactionType;
 import com.mokin.myfinances.app.detail_views.CategoryDetailsFragment;
 import com.mokin.myfinances.app.detail_views.TransactionDetails;
+
+import java.util.Calendar;
 
 
 public class TransactionListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>  {
@@ -33,6 +38,8 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     private TransactionAdapter mTransactionAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
+
+    private View mSummaryHeader;
 
     private static final String SELECTED_KEY = "selected_position";
 
@@ -63,6 +70,12 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
         // Get a reference to the ListView, and attach this adapter to it.
         mListView = (ListView) rootView.findViewById(R.id.listView);
         mListView.setEmptyView(rootView.findViewById(R.id.emptyView));
+
+
+        // Transactions summary
+        mSummaryHeader = inflater.inflate(R.layout.transaction_list_summary, null, false);
+
+        mListView.addHeaderView(mSummaryHeader, null, false);
         mListView.setAdapter(mTransactionAdapter);
 
 
@@ -97,6 +110,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
 
         return rootView;
     }
+
 
 
     @Override
@@ -216,7 +230,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        String sortOrder = FinContract.Transactions.COLUMN_TRANSACTION_DATETIME + " ASC";
+        String sortOrder = FinContract.Transactions.COLUMN_TRANSACTION_DATETIME + " DESC";
 
         return new CursorLoader(getActivity(),
                 FinContract.Transactions.CONTENT_URI_WITH_CATEGORY_NAME,
@@ -228,7 +242,71 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mTransactionAdapter.swapCursor(data);
+
+        MatrixCursor matrixCursor = new MatrixCursor(FinContract.Transactions.TRANSACTION_COLUMNS_2);
+        int date_num = 0;
+        long transaction_datetime;
+        double income_sum = 0, expense_sum = 0;
+
+        Calendar calendar = Calendar.getInstance();
+
+        while (data.moveToNext()) {
+
+            if (TransactionType.Expense.getId() == data.getInt(FinContract.Transactions.COL_TRANSACTION_TYPE_ID_IDX)) {
+                expense_sum += data.getDouble(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX);
+            } else if (TransactionType.Income.getId() == data.getInt(FinContract.Transactions.COL_TRANSACTION_TYPE_ID_IDX)) {
+                income_sum += data.getDouble(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX);
+            }
+
+            transaction_datetime = data.getLong(FinContract.Transactions.COL_TRANSACTION_DATETIME_IDX);
+            calendar.setTimeInMillis(transaction_datetime);
+
+            // if new date separator
+            if (date_num != calendar.get(Calendar.DATE))
+            {
+                matrixCursor.addRow(new Object[]{0, transaction_datetime, null, null, null, null, null, null, null, null, null});
+                matrixCursor.addRow(new Object[]{
+                        data.getInt(FinContract.Transactions.COL_ID_IDX),
+                        transaction_datetime,
+                        data.getDouble(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX),
+                        data.getInt(FinContract.Transactions.COL_ACCOUNT_ID_IDX),
+                        data.getInt(FinContract.Transactions.COL_CATEGORY_ID_IDX),
+                        data.getString(FinContract.Transactions.COL_CATEGORY_NAME_IDX),
+                        data.getInt(FinContract.Transactions.COL_TRANSACTION_TYPE_ID_IDX),
+                        data.getString(FinContract.Transactions.COL_COMMENT_IDX),
+                        null, // COLUMN_MARKET_ID
+                        null, // COLUMN_ACCOUNT_SOURCE
+                        null // COLUMN_ACCOUNT_TARGET
+                });
+
+                date_num = calendar.get(Calendar.DATE);
+
+            } else
+            // the same date
+            {
+                matrixCursor.addRow(new Object[]{
+                        data.getInt(FinContract.Transactions.COL_ID_IDX),
+                        transaction_datetime,
+                        data.getDouble(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX),
+                        data.getInt(FinContract.Transactions.COL_ACCOUNT_ID_IDX),
+                        data.getInt(FinContract.Transactions.COL_CATEGORY_ID_IDX),
+                        data.getString(FinContract.Transactions.COL_CATEGORY_NAME_IDX),
+                        data.getInt(FinContract.Transactions.COL_TRANSACTION_TYPE_ID_IDX),
+                        data.getString(FinContract.Transactions.COL_COMMENT_IDX),
+                        null, // COLUMN_MARKET_ID
+                        null, // COLUMN_ACCOUNT_SOURCE
+                        null // COLUMN_ACCOUNT_TARGET
+                });
+            }
+        }
+
+        mTransactionAdapter.swapCursor(matrixCursor);
+
+        // Set transactions summary in summary header
+        ((TextView) mSummaryHeader.findViewById(R.id.expense_value)).setText(Double.toString(expense_sum));
+        ((TextView) mSummaryHeader.findViewById(R.id.income_value)).setText(Double.toString(income_sum));
+        ((TextView) mSummaryHeader.findViewById(R.id.summary_value)).setText(Double.toString(income_sum-expense_sum));
+
         if (mPosition != ListView.INVALID_POSITION) {
             // If we don't need to restart the loader, and there's a desired position to restore
             mListView.smoothScrollToPosition(mPosition);

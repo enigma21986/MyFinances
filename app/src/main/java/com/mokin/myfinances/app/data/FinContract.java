@@ -141,6 +141,20 @@ public class FinContract {
                 COLUMN_ACCOUNT_TARGET
         };
 
+        public static final String[] TRANSACTION_COLUMNS_2 = {
+                _ID,
+                COLUMN_TRANSACTION_DATETIME,
+                COLUMN_TRANSACTION_AMOUNT,
+                COLUMN_ACCOUNT_ID,
+                COLUMN_CATEGORY_ID,
+                COLUMN_CATEGORY_NAME,
+                COLUMN_TRANSACTION_TYPE_ID,
+                COLUMN_COMMENT,
+                COLUMN_MARKET_ID,
+                COLUMN_ACCOUNT_SOURCE,
+                COLUMN_ACCOUNT_TARGET
+        };
+
         // Indexes related to TRANSACTION_COLUMNS. If TRANSACTION_COLUMNS changes, these must be changed
         public static final int COL_ID_IDX = 0;
         public static final int COL_TRANSACTION_DATETIME_IDX = 1;

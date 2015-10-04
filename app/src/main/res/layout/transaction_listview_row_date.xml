@@ -8,7 +8,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="2dp"
+        android:text="DD MM YYYY"
         android:fontFamily="sans-serif-condensed"
         android:textAppearance="?android:textAppearanceLarge"/>
+
+    <!-- Stub: currently don't need it -->
+    <TextView
+        android:id="@+id/transaction_category_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/transaction_comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/transaction_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+    <!-- Stub -->
 
 </LinearLayout>
