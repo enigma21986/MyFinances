@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -86,6 +87,14 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
             }
         });
 
+        FloatingActionButton btnFab = (FloatingActionButton) rootView.findViewById(R.id.btnFloatingAction);
+        btnFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showCategoryDetails(null);
+            }
+        });
+
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
@@ -102,10 +111,10 @@ public class CategoryListFragment extends Fragment implements LoaderManager.Load
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
+        /*switch (item.getItemId()) {
             case R.id.add_new:
                 showCategoryDetails(null);
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }

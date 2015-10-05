@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -104,6 +105,16 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
             }
         });
 
+        FloatingActionButton btnFab = (FloatingActionButton) rootView.findViewById(R.id.btnFloatingAction);
+        btnFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTransactionDetails(null);
+            }
+        });
+
+
+
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
@@ -122,10 +133,10 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()) {
+        /*switch (item.getItemId()) {
             case R.id.add_new:
                 showTransactionDetails(null);
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
