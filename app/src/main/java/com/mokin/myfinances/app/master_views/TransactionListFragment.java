@@ -8,7 +8,9 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -41,6 +43,8 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     private int mPosition = ListView.INVALID_POSITION;
 
     private View mSummaryHeader;
+    //private Snackbar mSnackbar;
+    private CoordinatorLayout mRootView;
 
     private static final String SELECTED_KEY = "selected_position";
 
@@ -63,14 +67,14 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.general_list_layout, container, false);
+        mRootView = (CoordinatorLayout) inflater.inflate(R.layout.general_list_layout, container, false);
 
         // The CursorAdapter will take data from our cursor and populate the ListView.
         mTransactionAdapter = new TransactionAdapter(getActivity(), null, 0);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        mListView = (ListView) rootView.findViewById(R.id.listView);
-        mListView.setEmptyView(rootView.findViewById(R.id.emptyView));
+        mListView = (ListView) mRootView.findViewById(R.id.listView);
+        mListView.setEmptyView(mRootView.findViewById(R.id.emptyView));
 
 
         // Transactions summary
@@ -105,7 +109,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
             }
         });
 
-        FloatingActionButton btnFab = (FloatingActionButton) rootView.findViewById(R.id.btnFloatingAction);
+        FloatingActionButton btnFab = (FloatingActionButton) mRootView.findViewById(R.id.btnFloatingAction);
         btnFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -113,13 +117,11 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
             }
         });
 
-
-
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
 
-        return rootView;
+        return mRootView;
     }
 
 
@@ -154,6 +156,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (requestCode == DETAILS_REQUEST) {
 
             switch (resultCode) {
@@ -162,13 +165,12 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
                     break;
 
                 case CategoryDetailsFragment.RESULT_SAVE:
-                    Bundle bundle = data.getExtras();
-                    saveTransaction(bundle);
+                    saveTransaction(data.getExtras());
                     break;
 
                 case CategoryDetailsFragment.RESULT_DELETE:
                     int id = data.getIntExtra(FinContract.Transactions._ID, -1);
-                    deleteTransaction(id);
+                    deleteTransaction(id, data.getExtras());
                     break;
 
                 default:
@@ -198,15 +200,37 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
             Toast.makeText(getActivity(), "New transaction added with ID = " + id, Toast.LENGTH_SHORT).show();
         }
 
+        updateTransactionListView();
+    }
+
+    private void deleteTransaction(int id, final Bundle bundle) {
+
+        int rowsNum = getActivity().getContentResolver().delete(FinContract.Transactions.CONTENT_URI, "_id = " + id, null);
+        //Toast.makeText(getActivity(), "Deleted rows: " + rowsNum, Toast.LENGTH_SHORT).show();
+        updateTransactionListView();
+
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // In case of transaction rollback - insert the row again
+                ContentValues cv = getContentValues(bundle);
+                getActivity().getContentResolver().insert(FinContract.Transactions.CONTENT_URI, cv);
+                updateTransactionListView();
+            }
+        };
+
+        // Show Snackbar allowing Undo transaction
+        Snackbar.make(mRootView, "Undo deletion?", Snackbar.LENGTH_LONG)
+                .setDuration(7000)
+                .setAction("Undo", onClickListener)
+                .show();
+    }
+
+    private void updateTransactionListView() {
         getLoaderManager().restartLoader(TRANSACTIONS_LOADER, null, this);
     }
 
-    private void deleteTransaction(int id) {
-        int rows = getActivity().getContentResolver().delete(FinContract.Transactions.CONTENT_URI, "_id = " + id, null);
-        Toast.makeText(getActivity(), "Deleted rows: " + rows, Toast.LENGTH_SHORT).show();
 
-        getLoaderManager().restartLoader(TRANSACTIONS_LOADER, null, this);
-    }
 
 
     private ContentValues getContentValues(Bundle bundle) {
