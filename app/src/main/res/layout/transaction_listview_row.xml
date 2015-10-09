@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="@drawable/border">
 
-    <!-- Stub: currently don't need it? -->
+    <!-- Stub: just for matching transaction_listview_row_date.xml layout -->
     <TextView
         android:id="@+id/transaction_date"
         android:layout_width="match_parent"
