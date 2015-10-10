@@ -43,7 +43,6 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     private int mPosition = ListView.INVALID_POSITION;
 
     private View mSummaryHeader;
-    //private Snackbar mSnackbar;
     private CoordinatorLayout mRootView;
 
     private static final String SELECTED_KEY = "selected_position";
@@ -76,13 +75,11 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
         mListView = (ListView) mRootView.findViewById(R.id.listView);
         mListView.setEmptyView(mRootView.findViewById(R.id.emptyView));
 
-
         // Transactions summary
         mSummaryHeader = inflater.inflate(R.layout.transaction_list_summary, null, false);
 
         mListView.addHeaderView(mSummaryHeader, null, false);
         mListView.setAdapter(mTransactionAdapter);
-
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
