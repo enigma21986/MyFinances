@@ -1,7 +1,6 @@
 package com.mokin.myfinances.app.master_views;
 
 import android.app.Activity;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +41,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     private TransactionAdapter mTransactionAdapter;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;
+    private Bundle mBundle;
 
     private View mSummaryHeader;
     private CoordinatorLayout mRootView;
@@ -88,23 +89,28 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
                 // if it cannot seek to that position.
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 if (cursor != null) {
-                    Uri uri = ContentUris.withAppendedId(FinContract.Transactions.CONTENT_URI, cursor.getInt(FinContract.Transactions.COL_ID_IDX));
+                    //Uri uri = ContentUris.withAppendedId(FinContract.Transactions.CONTENT_URI, cursor.getInt(FinContract.Transactions.COL_ID_IDX));
                     //showTransactionDetails(uri);
-
-                    Bundle bundle = new Bundle();
-                    bundle.putInt(FinContract.Transactions._ID, cursor.getInt(FinContract.Transactions.COL_ID_IDX));
-                    bundle.putLong(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME, cursor.getLong(FinContract.Transactions.COL_TRANSACTION_DATETIME_IDX));
-                    bundle.putDouble(FinContract.Transactions.COLUMN_TRANSACTION_AMOUNT, cursor.getDouble(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX));
-                    bundle.putInt(FinContract.Transactions.COLUMN_ACCOUNT_ID, cursor.getInt(FinContract.Transactions.COL_ACCOUNT_ID_IDX));
-                    bundle.putInt(FinContract.Transactions.COLUMN_TRANSACTION_TYPE_ID, cursor.getInt(FinContract.Transactions.COL_TRANSACTION_TYPE_ID_IDX));
-                    bundle.putInt(FinContract.Transactions.COLUMN_CATEGORY_ID, cursor.getInt(FinContract.Transactions.COL_CATEGORY_ID_IDX));
-                    bundle.putString(FinContract.Transactions.COLUMN_COMMENT, cursor.getString(FinContract.Transactions.COL_COMMENT_IDX));
-
-                    showTransactionDetails(bundle);
+                    showTransactionDetails(getBundle(cursor));
                 }
                 mPosition = position;
             }
         });
+
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if (cursor != null) {
+                    mBundle = getBundle(cursor);
+                }
+                mPosition = position;
+                return false;
+            }
+        });
+
+        registerForContextMenu(mListView);
 
         FloatingActionButton btnFab = (FloatingActionButton) mRootView.findViewById(R.id.btnFloatingAction);
         btnFab.setOnClickListener(new View.OnClickListener() {
@@ -119,6 +125,19 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
         }
 
         return mRootView;
+    }
+
+
+    private Bundle getBundle(Cursor cursor){
+        Bundle bundle = new Bundle();
+        bundle.putInt(FinContract.Transactions._ID, cursor.getInt(FinContract.Transactions.COL_ID_IDX));
+        bundle.putLong(FinContract.Transactions.COLUMN_TRANSACTION_DATETIME, cursor.getLong(FinContract.Transactions.COL_TRANSACTION_DATETIME_IDX));
+        bundle.putDouble(FinContract.Transactions.COLUMN_TRANSACTION_AMOUNT, cursor.getDouble(FinContract.Transactions.COL_TRANSACTION_AMOUNT_IDX));
+        bundle.putInt(FinContract.Transactions.COLUMN_ACCOUNT_ID, cursor.getInt(FinContract.Transactions.COL_ACCOUNT_ID_IDX));
+        bundle.putInt(FinContract.Transactions.COLUMN_TRANSACTION_TYPE_ID, cursor.getInt(FinContract.Transactions.COL_TRANSACTION_TYPE_ID_IDX));
+        bundle.putInt(FinContract.Transactions.COLUMN_CATEGORY_ID, cursor.getInt(FinContract.Transactions.COL_CATEGORY_ID_IDX));
+        bundle.putString(FinContract.Transactions.COLUMN_COMMENT, cursor.getString(FinContract.Transactions.COL_COMMENT_IDX));
+        return bundle;
     }
 
 
@@ -166,8 +185,8 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
                     break;
 
                 case CategoryDetailsFragment.RESULT_DELETE:
-                    int id = data.getIntExtra(FinContract.Transactions._ID, -1);
-                    deleteTransaction(id, data.getExtras());
+                    //int id = data.getIntExtra(FinContract.Transactions._ID, -1);
+                    deleteTransaction(data.getExtras());
                     break;
 
                 default:
@@ -200,8 +219,9 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
         updateTransactionListView();
     }
 
-    private void deleteTransaction(int id, final Bundle bundle) {
+    private void deleteTransaction(final Bundle bundle) {
 
+        int id = bundle.getInt(FinContract.Transactions._ID);
         int rowsNum = getActivity().getContentResolver().delete(FinContract.Transactions.CONTENT_URI, "_id = " + id, null);
         //Toast.makeText(getActivity(), "Deleted rows: " + rowsNum, Toast.LENGTH_SHORT).show();
         updateTransactionListView();
@@ -218,7 +238,7 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
 
         // Show Snackbar allowing Undo transaction
         Snackbar.make(mRootView, "Undo deletion?", Snackbar.LENGTH_LONG)
-                .setDuration(7000)
+                .setDuration(Snackbar.LENGTH_LONG)
                 .setAction("Undo", onClickListener)
                 .show();
     }
@@ -348,5 +368,26 @@ public class TransactionListFragment extends Fragment implements LoaderManager.L
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mTransactionAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getActivity().getMenuInflater().inflate(R.menu.menu_context, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case R.id.contextMenuEdit:
+                showTransactionDetails(mBundle);
+                return true;
+            case R.id.contextMenuDelete:
+                deleteTransaction(mBundle);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 }

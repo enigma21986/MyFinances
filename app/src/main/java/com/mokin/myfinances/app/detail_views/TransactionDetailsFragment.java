@@ -179,7 +179,7 @@ public class TransactionDetailsFragment extends Fragment implements LoaderManage
                 builder.setPositiveButton(R.string.delete,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                getActivity().setResult(RESULT_DELETE, getActivity().getIntent().putExtra(FinContract.Transactions._ID, mTransactionId));
+                                getActivity().setResult(RESULT_DELETE, getActivity().getIntent());
                                 getActivity().finish();
                             }
                         });
